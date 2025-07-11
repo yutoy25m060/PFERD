@@ -1,3 +1,17 @@
+"""
+このスクリプトは、hSMALモデルのパラメータ（ポーズ、ベータ、トランスレーション）を用いて、
+フォワードキネマティクスにより各フレームの全ジョイントの3次元座標を計算し、
+その結果をCSVファイルとして保存します。
+
+【入力ファイル】
+- モデルパラメータ: dataset/ID_4/MODEL_DATA/20201129_ID_4_0007_hsmal.npz
+  （'poses', 'betas', 'trans' を含む）
+- hSMALモデル: hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl
+
+【出力ファイル】
+- JOINT_MODEL_DATA/Spatial_xyz_Data/ID_4/20201129_ID_4_0007_hsmal_joints_xyz.csv
+  （各フレーム・各ジョイントの3次元座標を格納したCSV）
+"""
 import numpy as np
 import torch
 from utils.smal import SMALLayer, HSMAL
@@ -46,6 +60,7 @@ def main():
     # forward計算で各ジョイントの空間座標を取得
     _, joints = smal_layer(poses_body, betas, trans, poses_root)
     joints = joints.cpu().numpy()  # (フレーム数, ジョイント数, 3)
+    joints = joints * 1000  # m → mm に変換
 
     print(f"joints shape: {joints.shape}")
     print(f"ジョイント数: {joints.shape[1]}")
@@ -58,9 +73,9 @@ def main():
         print(f"警告: ジョイント数({num_joints})とセグメント名リスト({len(segment_names)})が一致しません。")
     data = {}
     for j, name in enumerate(segment_names[:num_joints]):
-        data[f'{j}_{name}_x'] = joints[:, j, 0]
-        data[f'{j}_{name}_y'] = joints[:, j, 1]
-        data[f'{j}_{name}_z'] = joints[:, j, 2]
+        data[f'{j}_{name}_x [mm]'] = joints[:, j, 0]
+        data[f'{j}_{name}_y [mm]'] = joints[:, j, 1]
+        data[f'{j}_{name}_z [mm]'] = joints[:, j, 2]
     df = pd.DataFrame(data)
     df.insert(0, 'frame', range(num_frames))
     # 出力先ディレクトリ

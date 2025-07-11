@@ -1,3 +1,15 @@
+"""
+このスクリプトは、hSMALモデルのパラメータファイル（npz）を読み込み、
+フォワードキネマティクス計算を通じてジョイント数や形状を確認するためのものです。
+
+【入力ファイル】
+- dataset/ID_4/MODEL_DATA/20201129_ID_4_0007_hsmal.npz
+  （'poses', 'betas', 'trans' を含む）
+- hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl
+
+【出力】
+- 標準出力にジョイント数やshapeを表示
+"""
 import numpy as np
 import torch
 from utils.smal import SMALLayer, HSMAL

@@ -1,3 +1,15 @@
+"""
+このスクリプトは、hSMALモデルの推定結果（ポーズ・ベータ・トランスレーション）を3Dビューワーで可視化するためのものです。
+オプションでモーションキャプチャデータ（C3D）も重ねて表示できます。
+
+【入力ファイル】
+- CONFIG.py で指定されたパスのhSMAL推定結果（例: dataset/ID_x/MODEL_DATA/xxxx_hsmal.npz）
+- hSMALモデル: hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl
+- （オプション）モーションキャプチャ: dataset/ID_x/C3D_DATA/xxxx.c3d
+
+【出力】
+- 3Dビューワーによる可視化（ファイル出力はなし）
+"""
 import CONFIG
 import numpy as np
 import os
