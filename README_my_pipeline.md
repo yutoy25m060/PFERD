@@ -16,7 +16,10 @@ JOINT_MODEL_DATA/
   ├── Beta_shape_Data/            # 体型パラメータ（betas, 10次元）
   ├── Parents_Info/               # 親子構造リスト（parents_hsmal36.csv）
   ├── ParentChild_Distances/      # 親子間距離（全フレーム・全親子ペア、統計量も別ファイル）
-  ├── Angle_Y_Degree_from_poses/  # 各ジョイントのy軸角度のみ（degree）
+  ├── Angle_Y_Degree_from_poses/  # 各ジョイントのy軸角度のみ（degree, 相対角度）
+  ├── Angle_xyz_Degree_from_poses/# 各ジョイントのxyz角度（degree, 相対角度）
+  ├── Absolute_Angles/            # 各ジョイントのxyz絶対角度（degree, ワールド座標系）
+  ├── Absolute_Y_Degree/          # 各ジョイントのy軸絶対角度のみ（degree, ワールド座標系）
   ├── Spatial_xyz_Data_from_trans/# モデル全体の並進データ（trans）
   ├── Whole_Model_xyz_Data_from_trans/ # モデル全体の並進データ（別用途/形式）
   └── Motion_Movie_from_Load_Visualization/ # 可視化動画や説明ファイル
@@ -29,13 +32,62 @@ JOINT_MODEL_DATA/
 | スクリプト名 | 概要 |
 |:---|:---|
 | save_betas_batch.py | npzファイルから体型パラメータ（betas）を抽出し、CSV保存 |
-| save_joint_axisangle_batch.py | npzファイルから各ジョイントの軸角（axis-angle）を抽出し、CSV保存 |
+| save_joint_axisangle_batch.py | npzファイルから各ジョイントの軸角（axis-angle）を抽出し、CSV保存（新ジョイント名対応） |
 | save_translation_batch.py | npzファイルからモデル全体の並進（trans）を抽出し、CSV保存 |
 | forward_kinematics_example.py | npzファイルから各ジョイントの空間座標を計算し、CSV保存 |
 | check_joint_count.py | npzファイルからジョイント数を確認し、標準出力に表示 |
 | calc_parent_child_distances_batch.py | 空間座標CSVと親子リストCSVから親子間距離・統計量を計算し、CSV保存 |
-| extract_joint_y_angle_from_axisangle.py | 各CSVから各関節のy軸角度（degree）のみを抽出し、CSV保存 |
+| extract_joint_y_angle_from_axisangle.py | 各CSVから各関節のy軸角度（degree, 相対角度）のみを抽出し、CSV保存（新ジョイント名対応） |
+| extract_joint_xyz_angle_from_axisangle.py | 各CSVから各関節のxyz角度（degree, 相対角度）を抽出し、CSV保存（新ジョイント名対応） |
+| calc_absolute_angles_batch.py | 親子構造を用いて各ジョイントの絶対角度（xyz, degree, ワールド座標系）を計算し、CSV保存 |
+| extract_joint_y_absolute_angle.py | 絶対角度CSVから各ジョイントのy軸絶対角度のみを抽出し、CSV保存 |
+| create_xyz_angle_graphs.py | xyz角度（相対角度, degree）のグラフ（散布図・平滑線）を出力 |
+| create_xyz_absolute_angle_graphs.py | xyz絶対角度（degree, ワールド座標系）のグラフ（散布図・平滑線）を出力 |
+| create_y_absolute_angle_graphs.py | y軸絶対角度（degree, ワールド座標系）のグラフ（散布図・平滑線）を出力 |
 | visualize_skeleton_3d.py | 空間座標CSVと親子リストCSVを使い、1フレーム分のスケルトンを3D可視化（matplotlib） |
+
+---
+
+## ジョイント名・親子構造（最新版）
+
+```
+0  pelvis
+├── 1  spine1
+│   └── 2  spine2
+│       └── 3  shoulderBlade
+│           ├── 4  l_shoulder
+│           │   └── 5  l_elbow
+│           │       └── 6  l_carpal
+│           │           └── 7  lf_fetlock
+│           │               └── 8  lf_hoof
+│           ├── 9  r_shoulder
+│           │   └── 10  r_elbow
+│           │       └── 11  r_carpal
+│           │           └── 12  rf_fetlock
+│           │               └── 13  rf_hoof
+│           └── 14  neck_under
+│               └── 15  neck_upper
+│                   └── 16  head_base
+│                       └── 17  head_tip
+│                           ├── 33  ear_l
+│                           ├── 34  ear_r
+│                           └── 35  jaw_tip
+├── 18  l_hip
+│   └── 19  l_knee
+│       └── 20  l_hock
+│           └── 21  lh_fetlock
+│               └── 22  lh_hoof
+├── 23  r_hip
+│   └── 24  r_knee
+│       └── 25  r_hock
+│           └── 26  rh_fetlock
+│               └── 27  rh_hoof
+└── 28  tail_base
+    └── 29  tail_mid
+        └── 30  tail_mid2
+            └── 31  tail_mid3
+                └── 32  tail_tip
+```
 
 ---
 
@@ -60,6 +112,7 @@ JOINT_MODEL_DATA/
 
 1. 必要なスクリプトを順に実行し、各種CSVデータを生成
 2. 可視化や統計量計算、物理エンジン連携など、目的に応じてデータを活用
+3. 絶対角度・絶対Y角度の抽出やグラフ化も可能
 
 ---
 
@@ -71,6 +124,8 @@ JOINT_MODEL_DATA/
 ### コマンド例
 
 ```sh
+set KMP_DUPLICATE_LIB_OK=TRUE
+
 python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --end 100 --downSample 8 --VISUAL_MOCAP
 ```
 
@@ -92,6 +147,7 @@ python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --e
 - 各スクリプトの`horse_id`やファイルパスは適宜変更してください。
 - 別IDや他のnpzファイルにも対応可能です。
 - 可視化や出力形式のカスタマイズも柔軟に対応できます。
+- 絶対角度・絶対Y角度の抽出やグラフ化もサポートしています。
 
 ---
 

@@ -1,3 +1,9 @@
+"""
+このファイルは、プロジェクト全体で使用するパスやデバイス設定などを一元管理する設定ファイルです。
+- 各種データ・モデルのパス
+- デバイス（CPU/GPU）指定
+などを定義します。
+"""
 import os
 ProjectPATH = os.path.dirname(os.path.abspath(__file__))
 import sys

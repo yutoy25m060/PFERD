@@ -1,3 +1,9 @@
+"""
+このスクリプトは、hSMAL推定結果とセグメンテーションマスクのIoU（Intersection over Union）を評価・可視化するためのものです。
+- 入力: npz, セグメンテーション動画
+- 出力: IoU統計の表示、可視化（オプション）
+- コマンドライン引数でIDや可視化有無を指定可能
+"""
 import CONFIG
 import sys
 import matplotlib

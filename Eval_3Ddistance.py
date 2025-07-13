@@ -1,3 +1,9 @@
+"""
+このスクリプトは、hSMAL推定結果とモーションキャプチャデータの3Dマーカー距離を評価・可視化するためのものです。
+- 入力: npz, c3d
+- 出力: 距離統計の表示、可視化（オプション）
+- コマンドライン引数でIDや可視化有無を指定可能
+"""
 import CONFIG
 import numpy as np
 from tqdm import trange

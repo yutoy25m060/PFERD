@@ -21,13 +21,12 @@ def main():
     input_dir = os.path.join('dataset', horse_id, 'MODEL_DATA')
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Data_from_poses', horse_id)
 
-    # hSMAL 36セグメント正式名称リスト
+    # hSMAL 36セグメント正式名称リスト（馬のジョイント名）
     segment_names = [
-        'pelvis', 'left_hip', 'right_hip', 'spine1', 'left_knee', 'right_knee', 'spine2', 'left_ankle', 'right_ankle',
-        'spine3', 'left_foot', 'right_foot', 'neck', 'left_collar', 'right_collar', 'head', 'left_shoulder', 'right_shoulder',
-        'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist', 'jaw', 'left_eye_smplhf', 'right_eye_smplhf',
-        'left_index1', 'left_index2', 'left_index3', 'left_middle1', 'left_middle2', 'left_middle3',
-        'left_pinky1', 'left_pinky2', 'left_pinky3', 'left_ring1', 'left_ring2'
+        'pelvis', 'spine1', 'spine2', 'shoulderBlade', 'l_shoulder', 'l_elbow', 'l_carpal', 'lf_fetlock', 'lf_hoof',
+        'r_shoulder', 'r_elbow', 'r_carpal', 'rf_fetlock', 'rf_hoof', 'neck_under', 'neck_upper', 'head_base', 'head_tip',
+        'l_hip', 'l_knee', 'l_hock', 'lh_fetlock', 'lh_hoof', 'r_hip', 'r_knee', 'r_hock', 'rh_fetlock', 'rh_hoof',
+        'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'ear_l', 'ear_r', 'jaw_tip'
     ]
 
     os.makedirs(output_dir, exist_ok=True)
@@ -47,9 +46,9 @@ def main():
 
         data = {}
         for j, name in enumerate(segment_names[:n_joints]):
-            data[f'{j}_{name}_axis_x'] = poses[:, j*3 + 0]
-            data[f'{j}_{name}_axis_y'] = poses[:, j*3 + 1]
-            data[f'{j}_{name}_axis_z'] = poses[:, j*3 + 2]
+            data[f'joint{j}_{name}_x [rad]'] = poses[:, j*3 + 0]
+            data[f'joint{j}_{name}_y [rad]'] = poses[:, j*3 + 1]
+            data[f'joint{j}_{name}_z [rad]'] = poses[:, j*3 + 2]
         df = pd.DataFrame(data)
         df.insert(0, 'frame', range(n_frames))
 
