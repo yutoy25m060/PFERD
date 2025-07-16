@@ -3,13 +3,19 @@
 フォワードキネマティクスにより各フレームの全ジョイントの3次元座標を計算し、
 その結果をCSVファイルとして保存します。
 
+【注意】
+このスクリプトを実行する際は、PYTHONPATH にプロジェクトルート（PFERD/PFERD）を追加してください。
+例: Windowsの場合
+    set PYTHONPATH=%cd% && python scripts/forward_kinematics_example.py
+
+
 【入力ファイル】
-- モデルパラメータ: dataset/ID_4/MODEL_DATA/20201129_ID_4_0007_hsmal.npz
+- モデルパラメータ: dataset/ID_4/MODEL_DATA/20201129_ID_4_0002_hsmal.npz
   （'poses', 'betas', 'trans' を含む）
 - hSMALモデル: hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl
 
 【出力ファイル】
-- JOINT_MODEL_DATA/Spatial_xyz_Data/ID_4/20201129_ID_4_0007_hsmal_joints_xyz.csv
+- JOINT_MODEL_DATA/Spatial_xyz_Data/ID_4/20201129_ID_4_0002_hsmal_joints_xyz.csv
   （各フレーム・各ジョイントの3次元座標を格納したCSV）
 """
 import numpy as np
@@ -17,21 +23,20 @@ import torch
 from utils.smal import SMALLayer, HSMAL
 import os
 import pandas as pd
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.joint_utils import load_joint_names
 
 def get_hsmal_segment_names():
-    # hSMAL 36セグメント正式名称リスト（インデックス順）
-    return [
-        'pelvis', 'left_hip', 'right_hip', 'spine1', 'left_knee', 'right_knee', 'spine2', 'left_ankle', 'right_ankle',
-        'spine3', 'left_foot', 'right_foot', 'neck', 'left_collar', 'right_collar', 'head', 'left_shoulder', 'right_shoulder',
-        'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist', 'jaw', 'left_eye_smplhf', 'right_eye_smplhf',
-        'left_index1', 'left_index2', 'left_index3', 'left_middle1', 'left_middle2', 'left_middle3',
-        'left_pinky1', 'left_pinky2', 'left_pinky3', 'left_ring1', 'left_ring2'
-    ]
+    # ジョイント名をCSVファイルから読み込み
+    return load_joint_names('ID_4')
 
 def main():
     # 1. モデルのパラメータ（poses, betas, trans）を用意
     horse_id = 'ID_4'
-    npz_path = os.path.join('dataset', horse_id, 'MODEL_DATA', '20201129_ID_4_0007_hsmal.npz')
+    npz_path = os.path.join('dataset', horse_id, 'MODEL_DATA', '20201129_ID_4_0002_hsmal.npz')
     model_path = os.path.join('hSMALdata', 'my_smpl_0000_horse_new_skeleton_horse.pkl')
     npz = np.load(npz_path, allow_pickle=True)
     poses = npz['poses']      # (フレーム数, 3×ジョイント数)
@@ -61,6 +66,7 @@ def main():
     _, joints = smal_layer(poses_body, betas, trans, poses_root)
     joints = joints.cpu().numpy()  # (フレーム数, ジョイント数, 3)
     joints = joints * 1000  # m → mm に変換
+
 
     print(f"joints shape: {joints.shape}")
     print(f"ジョイント数: {joints.shape[1]}")

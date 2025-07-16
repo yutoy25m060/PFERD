@@ -2,6 +2,15 @@
 このスクリプトは、hSMALモデルの推定結果（ポーズ・ベータ・トランスレーション）を3Dビューワーで可視化するためのものです。
 オプションでモーションキャプチャデータ（C3D）も重ねて表示できます。
 
+
+
+【注意】
+Windows環境や一部の環境では、OpenMPの競合エラー回避のため、
+実行前に以下のコマンドで環境変数を設定してください：
+    set KMP_DUPLICATE_LIB_OK=TRUE
+    python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0003  --downSample 8 --VISUAL_MOCAP
+
+
 【入力ファイル】
 - CONFIG.py で指定されたパスのhSMAL推定結果（例: dataset/ID_x/MODEL_DATA/xxxx_hsmal.npz）
 - hSMALモデル: hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl

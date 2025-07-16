@@ -1,3 +1,7 @@
+"""
+このファイルはSMALおよびHSMALモデルの拡張クラスや、AITViewerを用いたテンプレート表示機能を提供します。
+動物体形状モデル（SMAL/HSMAL）のロードや、テンプレートポーズの可視化が可能です。
+"""
 import CONFIG
 import numpy as np
 import smplx

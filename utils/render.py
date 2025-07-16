@@ -1,3 +1,8 @@
+"""
+このファイルは3Dメッシュのレンダリングを行うRendererクラスを提供します。
+主にtrimeshおよびpyrenderを用いて、3Dメッシュの可視化や画像への描画をサポートします。
+SMPLify-XやCLIFFのコードを参考にしており、カメラパラメータや背景画像の指定も可能です。
+"""
 import os
 import trimesh
 import pyrender

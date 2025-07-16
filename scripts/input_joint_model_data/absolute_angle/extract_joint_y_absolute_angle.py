@@ -13,18 +13,18 @@
 import os
 import glob
 import pandas as pd
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.joint_utils import load_joint_names
 
 def main():
-    input_dir = 'JOINT_MODEL_DATA/Absolute_Angles/ID_4'
-    output_dir = 'JOINT_MODEL_DATA/Absolute_Y_Degree/ID_4'
+    horse_id = 'ID_4'
+    input_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
+    output_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Y_Degree', horse_id)
     os.makedirs(output_dir, exist_ok=True)
 
-    joint_names = [
-        'pelvis', 'spine1', 'spine2', 'shoulderBlade', 'l_shoulder', 'l_elbow', 'l_carpal', 'lf_fetlock', 'lf_hoof',
-        'r_shoulder', 'r_elbow', 'r_carpal', 'rf_fetlock', 'rf_hoof', 'neck_under', 'neck_upper', 'head_base', 'head_tip',
-        'l_hip', 'l_knee', 'l_hock', 'lh_fetlock', 'lh_hoof', 'r_hip', 'r_knee', 'r_hock', 'rh_fetlock', 'rh_hoof',
-        'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'ear_l', 'ear_r', 'jaw_tip'
-    ]
+    # ジョイント名をCSVファイルから読み込み
+    joint_names = load_joint_names(horse_id)
 
     csv_files = glob.glob(os.path.join(input_dir, '*.csv'))
     for csv_file in csv_files:

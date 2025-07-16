@@ -34,7 +34,7 @@ JOINT_MODEL_DATA/
 | save_betas_batch.py | npzファイルから体型パラメータ（betas）を抽出し、CSV保存 |
 | save_joint_axisangle_batch.py | npzファイルから各ジョイントの軸角（axis-angle）を抽出し、CSV保存（新ジョイント名対応） |
 | save_translation_batch.py | npzファイルからモデル全体の並進（trans）を抽出し、CSV保存 |
-| forward_kinematics_example.py | npzファイルから各ジョイントの空間座標を計算し、CSV保存 |
+| forward_kinematics_example.py | npzファイルから各ジョイントの空間座標を計算し、CSV保存（hSMALモデル・パラメータを用いたフォワードキネマティクス。出力は36ジョイント分のxyz座標。座標系や出力例は下記参照） |
 | check_joint_count.py | npzファイルからジョイント数を確認し、標準出力に表示 |
 | calc_parent_child_distances_batch.py | 空間座標CSVと親子リストCSVから親子間距離・統計量を計算し、CSV保存 |
 | extract_joint_y_angle_from_axisangle.py | 各CSVから各関節のy軸角度（degree, 相対角度）のみを抽出し、CSV保存（新ジョイント名対応） |
@@ -52,42 +52,44 @@ JOINT_MODEL_DATA/
 
 ```
 0  pelvis
-├── 1  spine1
-│   └── 2  spine2
-│       └── 3  shoulderBlade
-│           ├── 4  l_shoulder
-│           │   └── 5  l_elbow
-│           │       └── 6  l_carpal
-│           │           └── 7  lf_fetlock
-│           │               └── 8  lf_hoof
-│           ├── 9  r_shoulder
-│           │   └── 10  r_elbow
-│           │       └── 11  r_carpal
-│           │           └── 12  rf_fetlock
-│           │               └── 13  rf_hoof
-│           └── 14  neck_under
-│               └── 15  neck_upper
-│                   └── 16  head_base
-│                       └── 17  head_tip
-│                           ├── 33  ear_l
-│                           ├── 34  ear_r
-│                           └── 35  jaw_tip
-├── 18  l_hip
-│   └── 19  l_knee
-│       └── 20  l_hock
-│           └── 21  lh_fetlock
-│               └── 22  lh_hoof
-├── 23  r_hip
-│   └── 24  r_knee
-│       └── 25  r_hock
-│           └── 26  rh_fetlock
-│               └── 27  rh_hoof
-└── 28  tail_base
-    └── 29  tail_mid
-        └── 30  tail_mid2
-            └── 31  tail_mid3
-                └── 32  tail_tip
+1  left_hip
+2  right_hip
+3  spine1
+4  left_knee
+5  right_knee
+6  spine2
+7  left_ankle
+8  right_ankle
+9  spine3
+10 left_foot
+11 right_foot
+12 neck
+13 left_collar
+14 right_collar
+15 head
+16 left_shoulder
+17 right_shoulder
+18 left_elbow
+19 right_elbow
+20 left_wrist
+21 right_wrist
+22 jaw
+23 left_eye_smplhf
+24 right_eye_smplhf
+25 left_index1
+26 left_index2
+27 left_index3
+28 left_middle1
+29 left_middle2
+30 left_middle3
+31 left_pinky1
+32 left_pinky2
+33 left_pinky3
+34 left_ring1
+35 left_ring2
 ```
+
+※このリストはforward_kinematics_example.pyのget_hsmal_segment_names()に準拠
 
 ---
 
@@ -104,6 +106,11 @@ JOINT_MODEL_DATA/
 
 - **hSMALローカル座標**：X=前方、Y=左、Z=上
 - **ワールド座標（可視化・MuJoCo等）**：X=右、Y=上、Z=前
+- **本パイプラインの出力（CSV/可視化）**：
+    - **X軸**: 横方向（右方向）
+    - **Z軸**: 奥行き方向（前方向、床平面）
+    - **Y軸**: 上方向（鉛直、Y-up）
+    - **Y軸は反転済み（上が正）**
 - MuJoCo等の物理エンジンに連携する場合は、座標変換が必要です。
 
 ---
@@ -158,3 +165,25 @@ python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --e
 ---
 
 このREADMEをベースに、あなたの研究・開発に合わせて自由に追記・編集してください！ 
+
+### forward_kinematics_example.py の詳細
+
+- 入力: dataset/ID_x/MODEL_DATA/xxxx_hsmal.npz（'poses', 'betas', 'trans'を含む）、hSMALdata/my_smpl_0000_horse_new_skeleton_horse.pkl
+- 出力: JOINT_MODEL_DATA/Spatial_xyz_Data/ID_x/xxxx_hsmal_joints_xyz.csv（各フレーム・各ジョイントの3次元座標 [mm]）
+- 注意: ジョイント数や名称はget_hsmal_segment_names()に従う。
+- **出力座標系: X-Z平面、Y-up（Y軸が鉛直上向き、上が正）**
+- 実行例:
+
+```sh
+set PYTHONPATH=%cd%
+python scripts/forward_kinematics_example.py
+```
+
+---
+
+### visualize_skeleton_3d.py の詳細
+
+- 入力: JOINT_MODEL_DATA/Spatial_xyz_Data/ID_x/xxxx_hsmal_joints_xyz.csv、親子構造CSV
+- 出力: 3Dスケルトン可視化（matplotlib）
+- **可視化座標系: X-Z平面、Y-up（Y軸が鉛直上向き、上が正）**
+- 軸ラベル: X (mm), Z (mm), Y (mm) 

@@ -18,6 +18,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import make_interp_spline
 
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.joint_utils import load_joint_names
+
 def main():
     horse_id = 'ID_4'
     input_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
@@ -25,12 +29,8 @@ def main():
     os.makedirs(output_base_dir, exist_ok=True)
 
     axes = ['x', 'y', 'z']
-    joint_names = [
-        'pelvis', 'spine1', 'spine2', 'shoulderBlade', 'l_shoulder', 'l_elbow', 'l_carpal', 'lf_fetlock', 'lf_hoof',
-        'r_shoulder', 'r_elbow', 'r_carpal', 'rf_fetlock', 'rf_hoof', 'neck_under', 'neck_upper', 'head_base', 'head_tip',
-        'l_hip', 'l_knee', 'l_hock', 'lh_fetlock', 'lh_hoof', 'r_hip', 'r_knee', 'r_hock', 'rh_fetlock', 'rh_hoof',
-        'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'ear_l', 'ear_r', 'jaw_tip'
-    ]
+    # ジョイント名をCSVファイルから読み込み
+    joint_names = load_joint_names(horse_id)
 
     csv_files = sorted(glob.glob(os.path.join(input_dir, '*.csv')))
     if not csv_files:

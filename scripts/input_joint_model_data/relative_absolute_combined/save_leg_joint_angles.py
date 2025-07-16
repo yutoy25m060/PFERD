@@ -14,37 +14,23 @@ import os
 import glob
 import pandas as pd
 import numpy as np
-
-def get_descendants_dfs(base, parent_dict):
-    descendants = []
-    def dfs(node):
-        children = [k for k, v in parent_dict.items() if v == node]
-        for child in children:
-            descendants.append(child)
-            dfs(child)
-    dfs(base)
-    return descendants
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.joint_utils import load_joint_names, load_joint_hierarchy, get_descendants_dfs
 
 def main():
     horse_id = 'ID_4'
     abs_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
     rel_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Degree_from_poses', horse_id)
-    parent_file = os.path.join('JOINT_MODEL_DATA', 'Parents_Info', horse_id, 'parents_hsmal36.csv')
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Leg_Joint_Angles', horse_id)
     os.makedirs(output_dir, exist_ok=True)
 
-    # ジョイント名リスト（他スクリプトと統一）
-    joint_names = [
-        'pelvis', 'spine1', 'spine2', 'shoulderBlade', 'l_shoulder', 'l_elbow', 'l_carpal', 'lf_fetlock', 'lf_hoof',
-        'r_shoulder', 'r_elbow', 'r_carpal', 'rf_fetlock', 'rf_hoof', 'neck_under', 'neck_upper', 'head_base', 'head_tip',
-        'l_hip', 'l_knee', 'l_hock', 'lh_fetlock', 'lh_hoof', 'r_hip', 'r_knee', 'r_hock', 'rh_fetlock', 'rh_hoof',
-        'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'ear_l', 'ear_r', 'jaw_tip'
-    ]
+    # 親子構造とジョイント名をCSVファイルから読み込み
+    parent_dict = load_joint_hierarchy(horse_id)
+    joint_names = load_joint_names(horse_id)
     base_joints = [4, 9, 18, 23]
 
-    # 親子構造
-    parents_df = pd.read_csv(parent_file)
-    parent_dict = dict(zip(parents_df['joint_index'], parents_df['parent_index']))
+
 
     abs_files = sorted(glob.glob(os.path.join(abs_dir, '*.csv')))
     rel_files = sorted(glob.glob(os.path.join(rel_dir, '*.csv')))
