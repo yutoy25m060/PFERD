@@ -52,44 +52,44 @@ JOINT_MODEL_DATA/
 
 ```
 0  pelvis
-1  left_hip
-2  right_hip
-3  spine1
-4  left_knee
-5  right_knee
-6  spine2
-7  left_ankle
-8  right_ankle
-9  spine3
-10 left_foot
-11 right_foot
-12 neck
-13 left_collar
-14 right_collar
-15 head
-16 left_shoulder
-17 right_shoulder
-18 left_elbow
-19 right_elbow
-20 left_wrist
-21 right_wrist
-22 jaw
-23 left_eye_smplhf
-24 right_eye_smplhf
-25 left_index1
-26 left_index2
-27 left_index3
-28 left_middle1
-29 left_middle2
-30 left_middle3
-31 left_pinky1
-32 left_pinky2
-33 left_pinky3
-34 left_ring1
-35 left_ring2
+1  spine1
+2  spine2
+3  shoulderBlade
+4  l_shoulder
+5  l_elbow
+6  l_carpal
+7  lf_fetlock
+8  lf_hoof
+9  r_shoulder
+10 r_elbow
+11 r_carpal
+12 rf_fetlock
+13 rf_hoof
+14 neck_under
+15 neck_upper
+16 head_base
+17 head_tip
+18 l_hip
+19 l_knee
+20 l_hock
+21 lh_fetlock
+22 lh_hoof
+23 r_hip
+24 r_knee
+25 r_hock
+26 rh_fetlock
+27 rh_hoof
+28 tail_base
+29 tail_mid
+30 tail_mid2
+31 tail_mid3
+32 tail_tip
+33 jaw_tip
+34 ear_l
+35 ear_r
 ```
 
-※このリストはforward_kinematics_example.pyのget_hsmal_segment_names()に準拠
+※このリストは`JOINT_MODEL_DATA/Parents_Info/ID_4/parents_hsmal36.csv`に準拠
 
 ---
 
