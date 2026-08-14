@@ -14,13 +14,13 @@ import time
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'  # OpenMP競合回避
 
 # スクリプト実行関数
-def run_script(script, args=None, env=None):
+def run_script(script, args=None, env=None, cwd=None):
     cmd = [sys.executable, script]
     if args:
         cmd += args
     print(f'実行: {" ".join(cmd)}')
     try:
-        subprocess.run(cmd, check=True, env=env)
+        subprocess.run(cmd, check=True, env=env, cwd=cwd)
     except subprocess.CalledProcessError as e:
         print(f'エラー: {script} の実行中に失敗しました')
         raise e
@@ -48,10 +48,10 @@ SCRIPT_LIST = [
 ]
 
 if __name__ == '__main__':
-    # PYTHONPATHをプロジェクトルートに統一
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    # PYTHONPATHをプロジェクトルートに統一（このファイルは scripts/batch/ 配下なので2階層上）
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     env = os.environ.copy()
-    env['PYTHONPATH'] = "C:/Users/Yuto/github_repositories/PFERD/PFERD"
+    env['PYTHONPATH'] = project_root
 
     total_scripts = len(SCRIPT_LIST)
     times = []
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     for idx, (script, desc) in enumerate(SCRIPT_LIST, 1):
         print(f'\n[{idx}/{total_scripts}] {desc} ({script})')
         start = time.time()
-        run_script(script, env=env)
+        run_script(script, env=env, cwd=project_root)
         elapsed = time.time() - start
         times.append(elapsed)
         avg_time = sum(times) / len(times)

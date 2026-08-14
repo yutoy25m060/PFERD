@@ -160,4 +160,7 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
-JOINT_MODEL_DATA/
+# パイプラインの出力データは追跡しない。ただし全スクリプトが依存する親子構造CSVは例外。
+# gitは除外済みディレクトリ配下のファイルを再包含できないため、`/*` と否定パターンで書く。
+JOINT_MODEL_DATA/*
+!JOINT_MODEL_DATA/Parents_Info/

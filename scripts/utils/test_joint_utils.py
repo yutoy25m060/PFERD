@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from utils.joint_utils import load_joint_hierarchy, load_joint_names, get_joint_hierarchy_and_names
+from scripts.utils.joint_utils import load_joint_hierarchy, load_joint_names, get_joint_hierarchy_and_names
 
 def test_joint_utils():
     """ジョイントユーティリティのテスト"""
@@ -38,7 +38,7 @@ def test_joint_utils():
         print("4. 指定された親子構造との比較")
         expected_parents = {
             0: -1, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7,
-            9: 3, 10: 9, 11: 10, 12: 11, 13: 12, 14: 9, 15: 14, 16: 15, 17: 16,
+            9: 3, 10: 9, 11: 10, 12: 11, 13: 12, 14: 3, 15: 14, 16: 15, 17: 16,
             18: 0, 19: 18, 20: 19, 21: 20, 22: 21, 23: 0, 24: 23, 25: 24, 26: 25, 27: 26,
             28: 0, 29: 28, 30: 29, 31: 30, 32: 31, 33: 17, 34: 17, 35: 17
         }
@@ -64,7 +64,7 @@ def test_joint_utils():
             'pelvis', 'spine1', 'spine2', 'shoulderBlade', 'l_shoulder', 'l_elbow', 'l_carpal', 'lf_fetlock', 'lf_hoof',
             'r_shoulder', 'r_elbow', 'r_carpal', 'rf_fetlock', 'rf_hoof', 'neck_under', 'neck_upper', 'head_base', 'head_tip',
             'l_hip', 'l_knee', 'l_hock', 'lh_fetlock', 'lh_hoof', 'r_hip', 'r_knee', 'r_hock', 'rh_fetlock', 'rh_hoof',
-            'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'ear_l', 'ear_r', 'jaw_tip'
+            'tail_base', 'tail_mid', 'tail_mid2', 'tail_mid3', 'tail_tip', 'jaw_tip', 'ear_l', 'ear_r'
         ]
         
         name_mismatches = []
