@@ -1,4 +1,6 @@
-# Ignore large files and subdirectories in this directory
-*
-# Except this file
+# hSMAL model assets are tracked in this repository.
+# Keep the directory contents commit-able by not ignoring the files here.
 !.gitignore
+!.gitkeep
+!*.npz
+!*.pkl
