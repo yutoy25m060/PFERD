@@ -3,39 +3,13 @@
 親子関係を用いて各ジョイントの絶対角度（ワールド座標系でのx, y, z角度, degree）を計算し、
 JOINT_MODEL_DATA/Absolute_Angles/ID_4/ に短いファイル名で保存します。
 
-`/scripts/input_joint_model_data/absolute_angle` ディレクトリで出力される「絶対角度」は、  
-**ワールド座標系（グローバル座標系）を基準**に各ジョイントの回転を算出したものです。
-
----
-
-### 詳細解説
-
-#### 1. 「絶対角度」とは？
-- **絶対角度**は「各ジョイントがワールド座標系（グローバル座標系）に対して、どの向きに回転しているか」を表します。
-- これは「親ジョイントからの相対角度」ではなく、「空間全体に対する絶対的な回転角度」です。
-
-#### 2. 算出方法
-- 代表的なスクリプト `calc_absolute_angles_batch.py` では、フォワードキネマティクス（全身の親子関係をたどる）を使って、  
-  各ジョイントの「グローバル回転行列」を計算します。
-- そのグローバル回転行列をオイラー角（xyz順など）に変換し、「絶対角度」として出力しています。
-
-#### 3. どこが基準か？
-- **基準はワールド座標系（グローバル座標系、すなわち「地面に対しての向き」）です。**
-- 例えば、Tポーズ（全角度0）なら全てのジョイントの絶対角度も0度になります。
-- あるジョイントが「絶対角度30度」となっていれば、「地面（ワールド座標系）に対して30度回転している」ことを意味します。
-
-#### 4. 参考
-- スクリプト内で「親子関係をたどってグローバル回転を計算」している部分が該当します。
-- 例：`calc_absolute_angles_batch.py` の「親からの回転を累積してグローバル回転を得る」処理。
-
----
-
-### まとめ
-
-- **絶対角度の基準は「ワールド座標系（グローバル座標系）」です。**
-- 各ジョイントが「空間全体に対して」どの向きかを表します。
-
-もし「相対角度（親から見た回転）」との違いや、具体的な計算式などさらに詳しく知りたい場合はご質問ください。
+【「絶対角度」とは】
+- 各ジョイントが「ワールド座標系（グローバル座標系）」に対してどの向きに回転しているかを表す角度。
+  親ジョイントから見た相対角度（poses に入っている値）とは異なる。
+- 算出方法: 親子関係をルートからたどり、親のグローバル回転行列に自身の相対回転行列を
+  右から掛けて累積する（R_global[j] = R_global[parent] @ R_local[j]）。
+  得られたグローバル回転行列を xyz 順のオイラー角（度）に変換して出力する。
+- Tポーズ（全ジョイントの相対角度が0）では、全ジョイントの絶対角度も0度になる。
 
 【入力ファイル】
 - JOINT_MODEL_DATA/Angle_xyz_Data_from_poses/ID_4/*.csv
@@ -52,18 +26,18 @@ import pandas as pd
 from scipy.spatial.transform import Rotation as R
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
-from scripts.utils.joint_utils import load_joint_names, load_joint_hierarchy
+from scripts.utils.joint_utils import load_joint_names, get_parents_list
 
 def main():
     horse_id = 'ID_4'
     input_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Data_from_poses', horse_id)
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
     os.makedirs(output_dir, exist_ok=True)
-    
+
     # 親子構造とジョイント名をCSVファイルから読み込み
-    parent_dict = load_joint_hierarchy(horse_id)
+    # parents[j] はジョイントjの親。インデックス順が保証された取得方法を使うこと。
+    parents = get_parents_list(horse_id)
     joint_names = load_joint_names(horse_id)
-    parents = list(parent_dict.values())
     n_joints = len(joint_names)
 
     csv_files = glob.glob(os.path.join(input_dir, '*.csv'))

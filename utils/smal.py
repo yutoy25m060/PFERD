@@ -54,7 +54,8 @@ def load_template():
     examples/load_template.py
     '''
     # Create a neutral hSMAL T Pose.
-    device = "cuda:0"
+    # デバイスはCONFIG.pyに従う（"cuda:0"決め打ちだとGPUのない環境で落ちるため）
+    device = CONFIG.DEVICE
     hsmal_layer = SMALLayer(
         model_path=CONFIG.ModelPATH,
         model_cls=HSMAL,

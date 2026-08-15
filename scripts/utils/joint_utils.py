@@ -13,15 +13,39 @@ def load_joint_hierarchy(horse_id='ID_4', hierarchy_file='parents_hsmal36.csv'):
         hierarchy_file (str): 親子構造CSVファイル名
     
     Returns:
-        dict: {joint_index: parent_index} の辞書
+        dict: {joint_index: parent_index} の辞書（joint_index昇順）
     """
     hierarchy_path = os.path.join('JOINT_MODEL_DATA', 'Parents_Info', horse_id, hierarchy_file)
     if not os.path.exists(hierarchy_path):
         raise FileNotFoundError(f"親子構造ファイルが見つかりません: {hierarchy_path}")
-    
+
     df = pd.read_csv(hierarchy_path)
-    hierarchy = dict(zip(df['joint_index'], df['parent_index']))
+    # load_joint_names と同じくインデックス順に揃える。
+    # 呼び出し側が list(hierarchy.values()) のように挿入順に依存しても壊れないようにするため。
+    df_sorted = df.sort_values('joint_index')
+    hierarchy = dict(zip(df_sorted['joint_index'].astype(int), df_sorted['parent_index'].astype(int)))
     return hierarchy
+
+
+def get_parents_list(horse_id='ID_4', hierarchy_file='parents_hsmal36.csv'):
+    """
+    親子構造を「インデックス順のリスト」で返す（parents[j] = ジョイントjの親、ルートは-1）
+
+    load_joint_hierarchy() の戻り値を list(...values()) するとCSVの行順に依存するため、
+    順序が意味を持つ用途では必ずこちらを使うこと。
+
+    Args:
+        horse_id (str): 馬のID
+        hierarchy_file (str): 親子構造CSVファイル名
+
+    Returns:
+        list: parents[joint_index] = parent_index
+    """
+    hierarchy = load_joint_hierarchy(horse_id, hierarchy_file)
+    missing = [j for j in range(len(hierarchy)) if j not in hierarchy]
+    if missing:
+        raise ValueError(f"親子構造CSVのjoint_indexが0..{len(hierarchy) - 1}で連続していません（欠番: {missing}）")
+    return [hierarchy[j] for j in range(len(hierarchy))]
 
 def load_joint_names(horse_id='ID_4', names_file='parents_hsmal36.csv'):
     """

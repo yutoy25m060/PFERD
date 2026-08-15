@@ -42,8 +42,10 @@ SCRIPT_LIST = [
     ('scripts/input_joint_model_data/absolute_angle/create_xyz_absolute_angle_graphs.py', '絶対角度グラフ生成'),
     ('scripts/input_joint_model_data/relative_absolute_combined/create_leg_joint_angle_graphs.py', '脚用グラフ生成'),
     ('scripts/analysis/plot_joint_angle_comparison/plot_joint_angle_comparison.py', '角度比較グラフ生成'),
-    ('scripts/analysis/plot_joint_angle_comparison/generate_axis_gallery_html.py', 'ギャラリーHTML生成'),
+    # サマリー画像 → ギャラリーHTML の順であること。
+    # ギャラリーHTMLは summary/ ディレクトリを読むため、逆順にすると初回実行で必ず失敗する。
     ('scripts/analysis/plot_joint_angle_comparison/generate_axis_summary_images.py', 'サマリー画像生成'),
+    ('scripts/analysis/plot_joint_angle_comparison/generate_axis_gallery_html.py', 'ギャラリーHTML生成'),
     ('scripts/analysis/plot_joint_angle_comparison/check_yaxis_range.py', 'y軸範囲チェック'),
 ]
 

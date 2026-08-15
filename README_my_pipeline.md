@@ -43,8 +43,12 @@ JOINT_MODEL_DATA/
 | extract_joint_y_absolute_angle.py | 絶対角度CSVから各ジョイントのy軸絶対角度のみを抽出し、CSV保存 |
 | create_xyz_angle_graphs.py | xyz角度（相対角度, degree）のグラフ（散布図・平滑線）を出力 |
 | create_xyz_absolute_angle_graphs.py | xyz絶対角度（degree, ワールド座標系）のグラフ（散布図・平滑線）を出力 |
-| create_y_absolute_angle_graphs.py | y軸絶対角度（degree, ワールド座標系）のグラフ（散布図・平滑線）を出力 |
-| visualize_skeleton_3d.py | 空間座標CSVと親子リストCSVを使い、1フレーム分のスケルトンを3D可視化（matplotlib） |
+| save_leg_joint_angles.py | 脚部の基準ジョイント（4,9,18,23）の絶対角度＋その子孫の相対角度をまとめてCSV保存 |
+| extract_leg_joint_y_angle.py | 脚部角度CSVからY軸成分（絶対・相対）のみを抽出し、CSV保存 |
+| create_leg_joint_angle_graphs.py | 脚部ジョイント角度のグラフ（散布図・平滑線）を出力 |
+| plot_joint_angle_comparison.py | 絶対角度と相対角度を同一のy軸範囲で並べたグラフを出力 |
+| generate_axis_summary_images.py | 絶対角度・相対角度のグラフを左右に連結したサマリー画像を生成 |
+| generate_axis_gallery_html.py | サマリー画像の一覧HTMLギャラリーを生成 |
 
 ---
 
@@ -176,14 +180,19 @@ python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --e
 
 ```sh
 set PYTHONPATH=%cd%
-python scripts/forward_kinematics_example.py
+python scripts/input_dataset/forward_kinematics_example.py
 ```
 
 ---
 
-### visualize_skeleton_3d.py の詳細
+### 3Dスケルトン可視化について
 
-- 入力: JOINT_MODEL_DATA/Spatial_xyz_Data/ID_x/xxxx_hsmal_joints_xyz.csv、親子構造CSV
-- 出力: 3Dスケルトン可視化（matplotlib）
+かつて `visualize_skeleton_3d.py`（空間座標CSVから1フレーム分のスケルトンをmatplotlibで描画）
+がありましたが、現在は削除されています。Tポーズのスケルトン確認には
+`scripts/others/visualize_hsmal_skeleton.py` / `visualize_hsmal_tpose_3d.py` を、
+モーションの確認には `Load_Visualization.py`（aitviewer）を使ってください。
+
+なお、空間座標CSVを描画する際の座標系は以下の通りです。
+
 - **可視化座標系: X-Z平面、Y-up（Y軸が鉛直上向き、上が正）**
 - 軸ラベル: X (mm), Z (mm), Y (mm) 

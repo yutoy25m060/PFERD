@@ -13,7 +13,7 @@ Angle_Y_Degree_from_poses/ID_4_offset に新規保存するスクリプトです
 - 元のファイルは変更せず、新しいディレクトリに保存します。
 
 【実行例（Windowsコマンドプロンプト）】
-cd /d C:\Users\Yuto\github_repositories\PFERD\PFERD
+プロジェクトルート（CONFIG.py のあるディレクトリ）で実行すること。
 set PYTHONPATH=.
 python scripts/offset_tools/Angle_Y_Degree_add_joint_angle_offset.py
 
@@ -95,7 +95,8 @@ for fname in os.listdir(SRC_DIR):
             updated = True
 
     if updated:
-        df.to_csv(dst_path, index=False)
+        # 他の出力CSVと同じくutf-8-sig（Excelで開いたときの文字化け防止）
+        df.to_csv(dst_path, index=False, encoding='utf-8-sig')
         print(f"保存: {dst_path}")
     else:
         print(f"スキップ: {fname} (該当joint列がありません)")

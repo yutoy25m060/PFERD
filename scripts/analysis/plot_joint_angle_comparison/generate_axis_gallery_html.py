@@ -14,12 +14,21 @@
 import os
 import re
 import csv
+import sys
 
 horse_id = 'ID_4'
 summary_dir = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'summary')
 output_html = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'axis_gallery.html')
 
+if not os.path.isdir(summary_dir):
+    print(f'サマリー画像ディレクトリが見つかりません: {summary_dir}')
+    print('先に generate_axis_summary_images.py を実行してください。')
+    sys.exit(0)
+
 data_keys = [d for d in sorted(os.listdir(summary_dir)) if os.path.isdir(os.path.join(summary_dir, d))]
+if not data_keys:
+    print(f'サマリー画像が1件も見つかりません: {summary_dir}')
+    sys.exit(0)
 
 # joint_names_expected.csvのパス
 joint_names_csv = os.path.join('JOINT_MODEL_DATA', 'Parents_Info', horse_id, 'parents_hsmal36.csv')

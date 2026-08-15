@@ -24,12 +24,8 @@ import numpy as np
 import pandas as pd
 import os
 
-try:
-    print('1. joint_utilsのimport')
-    from scripts.utils.joint_utils import load_joint_names
-except ImportError:
-    print('1. joint_utilsのimport（フォールバック）')
-    from utils.joint_utils import load_joint_names
+print('1. joint_utilsのimport')
+from scripts.utils.joint_utils import load_joint_names
 
 try:
     print('2. 出力パス設定')

@@ -11,10 +11,16 @@
 - JOINT_MODEL_DATA/Leg_Joint_Angles/ID_4/graphs/
 
 コピー先:
-- JOINT_MODEL_DATA/All_Joint_Graphs/ID_4/<分類名>/（元のサブディレクトリ構造を維持）
+- JOINT_MODEL_DATA/Selected_Joint_Graphs/ID_4/<分類名>/（元のサブディレクトリ構造を維持）
+
+【注意】
+このスクリプトは update_joint_model_data.py のパイプラインには含まれていません。
+コピー先は plot_joint_angle_comparison.py の出力先と同じディレクトリなので、
+パイプライン実行後にこれを走らせると2種類のグラフが同じ場所に混在します。
+単体で使う場合のみ実行してください。
 
 【使い方】
-python copy_joint_graphs.py
+python scripts/batch/copy_joint_graphs.py
 """
 import os
 import shutil

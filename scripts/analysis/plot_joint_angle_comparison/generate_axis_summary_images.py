@@ -16,6 +16,7 @@
 #   右側：相対角度（Angle_xyz_Degree_from_poses）
 """
 import os
+import sys
 import glob
 import re
 from PIL import Image
@@ -46,6 +47,12 @@ def extract_key(dirname):
     return m.group(1) if m else None
 
 # 計測データディレクトリのペアリング
+for d in (abs_dir, xyz_dir):
+    if not os.path.isdir(d):
+        print(f'入力ディレクトリが見つかりません: {d}')
+        print('先に plot_joint_angle_comparison.py を実行してください。')
+        sys.exit(0)
+
 abs_data_dirs = [d for d in os.listdir(abs_dir) if os.path.isdir(os.path.join(abs_dir, d))]
 xyz_data_dirs = [d for d in os.listdir(xyz_dir) if os.path.isdir(os.path.join(xyz_dir, d))]
 abs_map = {}

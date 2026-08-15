@@ -14,10 +14,7 @@ import os
 import glob
 import numpy as np
 import pandas as pd
-from scripts.utils.joint_utils import load_joint_names
 
-# joint_utilsのimportが必要な場合は以下を追加
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
 
 def main():
     # --- 設定 ---

@@ -11,12 +11,27 @@
   （各行：frame, <基準ジョイント絶対角度>, <子孫相対角度>...）
 """
 import os
+import re
 import glob
 import pandas as pd
 import numpy as np
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
 from scripts.utils.joint_utils import load_joint_names, load_joint_hierarchy, get_descendants_dfs
+
+# 計測データ名（例: 20201129_ID_4_0002）をファイル名の先頭から取り出す
+DATA_KEY_RE = re.compile(r'^(\d{8}_ID_\d+_\d+)')
+
+
+def build_key_map(paths):
+    """計測データ名 -> ファイルパス の辞書を作る（キーを取れないファイルは無視）"""
+    key_map = {}
+    for path in sorted(paths):
+        m = DATA_KEY_RE.match(os.path.basename(path))
+        if m:
+            key_map[m.group(1)] = path
+    return key_map
+
 
 def main():
     horse_id = 'ID_4'
@@ -32,12 +47,22 @@ def main():
 
 
 
-    abs_files = sorted(glob.glob(os.path.join(abs_dir, '*.csv')))
-    rel_files = sorted(glob.glob(os.path.join(rel_dir, '*.csv')))
-    if len(abs_files) != len(rel_files):
-        print('Warning: ファイル数が一致しません')
+    # 絶対角度CSVと相対角度CSVは「計測データ名」をキーにして対応付ける。
+    # ソート順のindexで zip すると、片方に過不足があったときに
+    # 別の計測データ同士を1行に混ぜたCSVをエラーなしで生成してしまうため。
+    abs_map = build_key_map(glob.glob(os.path.join(abs_dir, '*.csv')))
+    rel_map = build_key_map(glob.glob(os.path.join(rel_dir, '*.csv')))
 
-    for abs_path, rel_path in zip(abs_files, rel_files):
+    common_keys = sorted(set(abs_map) & set(rel_map))
+    for key in sorted(set(abs_map) ^ set(rel_map)):
+        side = '相対角度' if key in abs_map else '絶対角度'
+        print(f'Warning: {key} は{side}CSVが見つからないためスキップします')
+    if not common_keys:
+        print(f'対応するファイルペアが見つかりません: {abs_dir} / {rel_dir}')
+        return
+
+    for key in common_keys:
+        abs_path, rel_path = abs_map[key], rel_map[key]
         print(f'Processing: {os.path.basename(abs_path)}')
         abs_df = pd.read_csv(abs_path)
         rel_df = pd.read_csv(rel_path)
@@ -93,9 +118,8 @@ def main():
         # frame以外のカラムが重複しないように
         ordered_columns = ['frame'] + [col for col in ordered_columns if col != 'frame' and col in out_df.columns]
         out_df = out_df[ordered_columns]
-        # 保存
-        base = os.path.splitext(os.path.basename(abs_path))[0].replace('_hsmal_hsmal_absolute', '')
-        out_name = f'{base}_leg_joint_angles.csv'
+        # 保存（ファイル名は計測データ名から組み立てる）
+        out_name = f'{key}_leg_joint_angles.csv'
         out_path = os.path.join(output_dir, out_name)
         out_df.to_csv(out_path, index=False, encoding='utf-8-sig')
         print(f'Saved: {out_path}')

@@ -31,10 +31,11 @@ def main():
         print(f'Processing: {os.path.basename(csv_file)}')
         # CSV読み込み
         df = pd.read_csv(csv_file)
-        data = df.values  # shape: (frame数, 関節数×3)
+        data = df.values  # shape: (frame数, 1 + 関節数×3)  ※先頭はframe列
         n_frames, n_cols = data.shape
-        n_joints = n_cols // 3
-        # y軸角度（2番目）だけ抽出
+        n_joints = n_cols // 3  # (3*J+1)//3 == J
+        # frame列があるため、関節jのx,y,zは列 1+3j, 2+3j, 3+3j にある。
+        # したがってy成分は列2から3つおき。
         y_angles = data[:, 2::3]  # shape: (frame数, 関節数)
         # rad→degree変換
         y_angles_deg = np.degrees(y_angles)

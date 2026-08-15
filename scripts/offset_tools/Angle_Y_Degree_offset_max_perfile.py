@@ -5,7 +5,7 @@ JOINT_MODEL_DATA/Angle_Y_Degree_from_poses/ID_4_offset 内の各CSVファイル�
 JOINT_MODEL_DATA/Angle_Y_Degree_from_poses/ID_4_offset_max フォルダに同名で保存します。
 
 【使い方（Windowsコマンドプロンプト例）】
-cd /d C:\Users\Yuto\github_repositories\PFERD\PFERD
+プロジェクトルート（CONFIG.py のあるディレクトリ）で実行すること。
 set PYTHONPATH=.
 python scripts/offset_tools/Angle_Y_Degree_offset_max_perfile.py
 """

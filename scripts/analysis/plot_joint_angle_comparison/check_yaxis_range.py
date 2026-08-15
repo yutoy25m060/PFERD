@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 # 設定
 horse_id = 'ID_4'
@@ -11,6 +12,12 @@ def extract_key(dirname):
     # 測定日時_ID_ID番号_測定データ番号 の部分を抽出
     m = re.match(r'^(\d{8}_ID_\d+_\d+)', dirname)
     return m.group(1) if m else None
+
+for d in (abs_sel_dir, xyz_sel_dir):
+    if not os.path.isdir(d):
+        print(f'入力ディレクトリが見つかりません: {d}')
+        print('先に plot_joint_angle_comparison.py を実行してください。')
+        sys.exit(0)
 
 abs_subdirs = sorted([d for d in os.listdir(abs_sel_dir) if os.path.isdir(os.path.join(abs_sel_dir, d))])
 xyz_subdirs = sorted([d for d in os.listdir(xyz_sel_dir) if os.path.isdir(os.path.join(xyz_sel_dir, d))])

@@ -27,21 +27,17 @@ import pandas as pd
 from scipy.spatial.transform import Rotation as R
 import os
 
-try:
-    print('1. joint_utilsのimport')
-    from scripts.utils.joint_utils import load_joint_names, load_joint_hierarchy
-except ImportError:
-    print('1. joint_utilsのimport（フォールバック）')
-    from utils.joint_utils import load_joint_names, load_joint_hierarchy
+print('1. joint_utilsのimport')
+from scripts.utils.joint_utils import load_joint_names, get_parents_list
 
 try:
     print('2. 出力パス設定')
     OUTPUT_PATH = 'JOINT_MODEL_DATA/Absolute_Angles/hsmal_tpose_angles.csv'
 
     print('3. 親子関係とジョイント名の取得')
-    parent_dict = load_joint_hierarchy('ID_4')
+    # parents[j] はジョイントjの親。インデックス順が保証された取得方法を使うこと。
+    parents = get_parents_list('ID_4')
     joint_names = load_joint_names('ID_4')
-    parents = list(parent_dict.values())
     n_joints = len(joint_names)
     print(f'   n_joints: {n_joints}')
 

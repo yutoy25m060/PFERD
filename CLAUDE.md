@@ -45,7 +45,9 @@ conda install -c anaconda scikit-learn=1.0.2
 3. `calc_parent_child_distances_batch.py` / `calc_absolute_angles_batch.py` — 空間座標・親子構造から距離・絶対角度を算出
 4. `extract_joint_*` 系スクリプト — 相対・絶対角度からY軸／XYZ角度成分を抽出
 5. `create_*_graphs.py` — 角度データのグラフ化
-6. `visualize_skeleton_3d.py` — matplotlibによる3Dスケルトン可視化
+6. `plot_joint_angle_comparison.py` → `generate_axis_summary_images.py` → `generate_axis_gallery_html.py` — 絶対角度と相対角度の比較グラフ、サマリー画像、一覧HTMLの生成（この順序に依存）
+
+`scripts/batch/update_joint_model_data.py` が上記18本を依存順に一括実行します。
 
 ## 座標系の注意
 

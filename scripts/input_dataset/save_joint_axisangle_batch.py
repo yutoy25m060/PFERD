@@ -38,10 +38,11 @@ def main():
 
     for npz_path in npz_files:
         npz = np.load(npz_path, allow_pickle=True)
-        poses = npz['poses']  # shape: (フレーム数, 108)
+        poses = npz['poses']  # shape: (フレーム数, ジョイント数×3)
         n_frames = poses.shape[0]
-        n_joints = 36
-        assert poses.shape[1] == n_joints * 3, f"poses shape mismatch: {poses.shape}"
+        n_joints = len(segment_names)  # 親子構造CSVを唯一の情報源とする
+        assert poses.shape[1] == n_joints * 3, \
+            f"poses shape mismatch: {poses.shape} (期待: (*, {n_joints * 3}))"
 
         data = {}
         for j, name in enumerate(segment_names[:n_joints]):
