@@ -46,6 +46,8 @@ r"""
 import os
 import pandas as pd
 
+from scripts.utils.cli import parse_horse_id
+
 
 # 1. オフセット設定（joint番号: オフセット値）
 JOINT_OFFSETS = {
@@ -72,8 +74,9 @@ JOINT_OFFSETS = {
     26: -26.6
 }
 
-SRC_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', 'ID_4')
-DST_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', 'ID_4_offset')
+horse_id = parse_horse_id('Y軸角度CSVの指定ジョイントにオフセットを加算する')
+SRC_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', horse_id)
+DST_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', f'{horse_id}_offset')
 os.makedirs(DST_DIR, exist_ok=True)
 
 for fname in os.listdir(SRC_DIR):

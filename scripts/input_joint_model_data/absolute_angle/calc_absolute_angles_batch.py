@@ -26,10 +26,51 @@ import pandas as pd
 from scipy.spatial.transform import Rotation as R
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names, get_parents_list
 
+
+def compute_absolute_eulers(xyz_angles, parents):
+    """
+    相対回転（axis-angle）から絶対回転のオイラー角[deg]を計算する
+
+    R_global[j] = R_global[parent[j]] @ R_local[j] を親から順に累積する。
+    フレーム方向はまとめて処理するため、ループはジョイント数（36回）だけで済む。
+
+    Args:
+        xyz_angles: (フレーム数, ジョイント数, 3) の axis-angle [rad]
+        parents: parents[j] = ジョイントjの親インデックス（ルートは-1）
+
+    Returns:
+        ndarray: (フレーム数, ジョイント数, 3) のオイラー角 [deg]（xyz順）
+    """
+    n_frames, n_joints, _ = xyz_angles.shape
+
+    # 親を先に計算し終えている必要があるため、親のインデックスが自分より小さいことを確認する
+    for j, p in enumerate(parents):
+        if p != -1 and not 0 <= p < j:
+            raise ValueError(
+                f"親子構造が親→子の順に並んでいません（joint{j} の親が {p}）。"
+                "parents_hsmal36.csv を確認してください。")
+
+    # 全フレーム・全ジョイントの相対回転行列を一括変換
+    rel_mats = R.from_rotvec(xyz_angles.reshape(-1, 3)).as_matrix()
+    rel_mats = rel_mats.reshape(n_frames, n_joints, 3, 3)
+
+    abs_mats = np.empty_like(rel_mats)
+    for j, p in enumerate(parents):
+        if p == -1:
+            abs_mats[:, j] = rel_mats[:, j]
+        else:
+            # (フレーム数,3,3) @ (フレーム数,3,3) のバッチ行列積
+            abs_mats[:, j] = abs_mats[:, p] @ rel_mats[:, j]
+
+    eulers = R.from_matrix(abs_mats.reshape(-1, 3, 3)).as_euler('xyz', degrees=True)
+    return eulers.reshape(n_frames, n_joints, 3)
+
+
 def main():
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('各ジョイントの絶対角度（ワールド座標系）を計算する')
     input_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Data_from_poses', horse_id)
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
     os.makedirs(output_dir, exist_ok=True)
@@ -40,7 +81,11 @@ def main():
     joint_names = load_joint_names(horse_id)
     n_joints = len(joint_names)
 
-    csv_files = glob.glob(os.path.join(input_dir, '*.csv'))
+    csv_files = sorted(glob.glob(os.path.join(input_dir, '*.csv')))
+    if not csv_files:
+        print(f'No CSV files found in {input_dir}')
+        return
+
     for csv_file in csv_files:
         print(f'Processing: {os.path.basename(csv_file)}')
         df = pd.read_csv(csv_file)
@@ -50,19 +95,7 @@ def main():
         data = data[:, 1:]
         xyz_angles = data.reshape(n_frames, n_joints, 3)  # (frame, joint, xyz)
 
-        # 絶対回転（回転行列）を格納
-        abs_rotmats = np.zeros((n_frames, n_joints, 3, 3))
-        abs_eulers = np.zeros((n_frames, n_joints, 3))
-        for f in range(n_frames):
-            for j in range(n_joints):
-                # 自身の相対回転（axis-angle→回転行列）
-                rel_rot = R.from_rotvec(xyz_angles[f, j, :])
-                if parents[j] == -1:
-                    abs_rotmats[f, j] = rel_rot.as_matrix()
-                else:
-                    abs_rotmats[f, j] = abs_rotmats[f, int(parents[j])] @ rel_rot.as_matrix()
-                # 絶対回転行列→オイラー角（xyz順、度）
-                abs_eulers[f, j, :] = R.from_matrix(abs_rotmats[f, j]).as_euler('xyz', degrees=True)
+        abs_eulers = compute_absolute_eulers(xyz_angles, parents)
         # DataFrame化
         columns = []
         for j, name in enumerate(joint_names):

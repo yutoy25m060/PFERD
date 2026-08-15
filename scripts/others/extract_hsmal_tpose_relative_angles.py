@@ -17,7 +17,7 @@ CSVファイルとして保存するものです。
 - python scripts/others/extract_hsmal_tpose_relative_angles.py
 
 【備考】
-- ジョイント名は scripts/utils/joint_utils.py の load_joint_names('ID_4') から取得します。
+- ジョイント名は scripts/utils/joint_utils.py の load_joint_names(horse_id) から取得します。
 - モデルパスや出力先は必要に応じて修正してください。
 """
 import numpy as np
@@ -25,6 +25,7 @@ import pandas as pd
 import os
 
 print('1. joint_utilsのimport')
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names
 
 try:
@@ -32,7 +33,8 @@ try:
     OUTPUT_PATH = 'JOINT_MODEL_DATA/hsmal_tpose_relative_angles.csv'
 
     print('3. ジョイント名の取得')
-    joint_names = load_joint_names('ID_4')
+    horse_id = parse_horse_id('Tポーズにおける各関節の相対回転（全て0度）をCSV保存する')
+    joint_names = load_joint_names(horse_id)
     n_joints = len(joint_names)
     print(f'   n_joints: {n_joints}')
 

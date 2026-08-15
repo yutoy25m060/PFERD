@@ -15,10 +15,11 @@ import numpy as np
 import pandas as pd
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names
 
 def main():
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('軸角CSVから各関節のxyz角度[deg]を抽出しCSV保存する')
     input_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Data_from_poses', horse_id)
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Degree_from_poses', horse_id)
     os.makedirs(output_dir, exist_ok=True)

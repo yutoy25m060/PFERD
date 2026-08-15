@@ -26,8 +26,10 @@ import os
 import shutil
 import glob
 
+from scripts.utils.cli import LEG_JOINT_INDICES, parse_horse_id
+
 # コピー元とコピー先のディレクトリ
-horse_id = 'ID_4'
+horse_id = parse_horse_id('各種グラフ画像を1箇所にまとめてコピーする')
 sources = [
     (os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id, 'graphs'), 'Absolute_Angles'),
     (os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Degree_from_poses', horse_id, 'graphs'), 'Angle_xyz_Degree_from_poses'),
@@ -35,8 +37,8 @@ sources = [
 ]
 dest_base = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id)
 
-# コピーしたいジョイント番号リスト
-copy_joint_indices = [4,5,6,7,8,9,10,11,12,13,18,19,20,21,22,23,24,25,26,27]
+# コピーしたいジョイント番号リスト（脚部20ジョイント）
+copy_joint_indices = LEG_JOINT_INDICES
 copy_joint_strs = [f'joint{idx}' for idx in copy_joint_indices]
 
 for src, category in sources:

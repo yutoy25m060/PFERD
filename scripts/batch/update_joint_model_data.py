@@ -1,15 +1,26 @@
 """
-このスクリプトは、/scripts ディレクトリ内のデータ生成系スクリプト（visualize_skeleton_3d.py以外）を順次実行し、
+このスクリプトは、/scripts ディレクトリ内のデータ生成系スクリプトを依存順に実行し、
 /JOINT_MODEL_DATA 配下の各種データ（空間座標・角度・体型・親子距離など）を一括で最新化します。
 
 【注意】
 - 親子関係・ジョイント名は parents_hsmal36.csv（3カラム: joint_index, parent_index, joint_name）に統一されています。
-- 必要に応じて horse_id や mocapname などを変更してください。
+
+【使い方】
+    python scripts/batch/update_joint_model_data.py                      # ID_4 を全ジョイント処理
+    python scripts/batch/update_joint_model_data.py --horse-id 1         # ID_1 を処理
+    python scripts/batch/update_joint_model_data.py --joints legs        # 脚部20ジョイントのみグラフ化
+    python scripts/batch/update_joint_model_data.py --joints legs --dpi 100
+
+--joints / --dpi はグラフ生成ステップにのみ渡されます。グラフ生成が処理時間の大半を
+占めるため、脚部だけが必要な場合は --joints legs を付けると大幅に短縮できます。
 """
 import subprocess
 import sys
 import os
 import time
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from scripts.utils.cli import build_parser
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'  # OpenMP競合回避
 
@@ -49,11 +60,30 @@ SCRIPT_LIST = [
     ('scripts/analysis/plot_joint_angle_comparison/check_yaxis_range.py', 'y軸範囲チェック'),
 ]
 
+# --joints / --dpi を受け付けるスクリプト（グラフを描画するもの）
+GRAPH_SCRIPTS = {
+    'scripts/input_joint_model_data/relative_angle/create_xyz_angle_graphs.py',
+    'scripts/input_joint_model_data/absolute_angle/create_xyz_absolute_angle_graphs.py',
+    'scripts/input_joint_model_data/relative_absolute_combined/create_leg_joint_angle_graphs.py',
+    'scripts/analysis/plot_joint_angle_comparison/plot_joint_angle_comparison.py',
+}
+
 if __name__ == '__main__':
+    args = build_parser('パイプラインの全スクリプトを依存順に一括実行する', graph_args=True).parse_args()
+
     # PYTHONPATHをプロジェクトルートに統一（このファイルは scripts/batch/ 配下なので2階層上）
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
     env = os.environ.copy()
     env['PYTHONPATH'] = project_root
+
+    common_args = ['--horse-id', args.horse_id]
+    # --joints は集合に正規化済みなので、子プロセスにはカンマ区切りで渡し直す
+    graph_args = ['--dpi', str(args.dpi)]
+    if args.joints is not None:
+        graph_args += ['--joints', ','.join(str(j) for j in sorted(args.joints))]
+
+    print(f'対象馬ID: {args.horse_id} / グラフ: dpi={args.dpi}, '
+          f'joints={"all" if args.joints is None else len(args.joints)}')
 
     total_scripts = len(SCRIPT_LIST)
     times = []
@@ -62,7 +92,8 @@ if __name__ == '__main__':
     for idx, (script, desc) in enumerate(SCRIPT_LIST, 1):
         print(f'\n[{idx}/{total_scripts}] {desc} ({script})')
         start = time.time()
-        run_script(script, env=env, cwd=project_root)
+        script_args = common_args + (graph_args if script in GRAPH_SCRIPTS else [])
+        run_script(script, args=script_args, env=env, cwd=project_root)
         elapsed = time.time() - start
         times.append(elapsed)
         avg_time = sum(times) / len(times)

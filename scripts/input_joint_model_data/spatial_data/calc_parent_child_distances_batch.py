@@ -22,10 +22,11 @@ import numpy as np
 
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_hierarchy
 
 # --- 設定 ---
-horse_id = 'ID_4'
+horse_id = parse_horse_id('空間座標CSVから親子間距離と統計量を計算しCSV保存する')
 input_dir = os.path.join('JOINT_MODEL_DATA', 'Spatial_xyz_Data', horse_id)
 output_dir = os.path.join('JOINT_MODEL_DATA', 'ParentChild_Distances', horse_id)
 os.makedirs(output_dir, exist_ok=True)

@@ -12,8 +12,11 @@ python scripts/offset_tools/Angle_Y_Degree_offset_max_perfile.py
 import os
 import pandas as pd
 
-SRC_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', 'ID_4_offset')
-DST_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', 'ID_4_offset_max')
+from scripts.utils.cli import parse_horse_id
+
+horse_id = parse_horse_id('オフセット済みY軸角度CSVから各joint列の最大値・最小値を集計する')
+SRC_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', f'{horse_id}_offset')
+DST_DIR = os.path.join('JOINT_MODEL_DATA', 'Angle_Y_Degree_from_poses', f'{horse_id}_offset_max')
 os.makedirs(DST_DIR, exist_ok=True)
 
 for fname in os.listdir(SRC_DIR):

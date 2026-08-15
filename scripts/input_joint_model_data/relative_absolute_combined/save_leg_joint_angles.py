@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names, load_joint_hierarchy, get_descendants_dfs
 
 # 計測データ名（例: 20201129_ID_4_0002）をファイル名の先頭から取り出す
@@ -34,7 +35,7 @@ def build_key_map(paths):
 
 
 def main():
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('脚部の基準ジョイントの絶対角度と子孫の相対角度をCSV保存する')
     abs_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
     rel_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Degree_from_poses', horse_id)
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Leg_Joint_Angles', horse_id)

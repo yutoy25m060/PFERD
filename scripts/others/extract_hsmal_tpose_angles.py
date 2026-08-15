@@ -19,7 +19,7 @@ CSVファイルとして保存するものです。
 - python scripts/others/extract_hsmal_tpose_angles.py
 
 【備考】
-- ジョイント名は scripts/utils/joint_utils.py の load_joint_names('ID_4') から取得します。
+- ジョイント名は scripts/utils/joint_utils.py の load_joint_names(horse_id) から取得します。
 - モデルパスや出力先は必要に応じて修正してください。
 """
 import numpy as np
@@ -28,6 +28,7 @@ from scipy.spatial.transform import Rotation as R
 import os
 
 print('1. joint_utilsのimport')
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names, get_parents_list
 
 try:
@@ -36,8 +37,9 @@ try:
 
     print('3. 親子関係とジョイント名の取得')
     # parents[j] はジョイントjの親。インデックス順が保証された取得方法を使うこと。
-    parents = get_parents_list('ID_4')
-    joint_names = load_joint_names('ID_4')
+    horse_id = parse_horse_id('Tポーズにおける各関節の絶対角度をCSV保存する')
+    parents = get_parents_list(horse_id)
+    joint_names = load_joint_names(horse_id)
     n_joints = len(joint_names)
     print(f'   n_joints: {n_joints}')
 

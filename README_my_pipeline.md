@@ -121,9 +121,38 @@ JOINT_MODEL_DATA/
 
 ## 使い方（例）
 
-1. 必要なスクリプトを順に実行し、各種CSVデータを生成
-2. 可視化や統計量計算、物理エンジン連携など、目的に応じてデータを活用
-3. 絶対角度・絶対Y角度の抽出やグラフ化も可能
+パイプライン全体は `scripts/batch/update_joint_model_data.py` が依存順に一括実行します。
+
+```sh
+set PYTHONPATH=.
+
+# ID_4 を全ジョイント処理（既定）
+python scripts/batch/update_joint_model_data.py
+
+# 別の馬を処理する
+python scripts/batch/update_joint_model_data.py --horse-id 1
+
+# 脚部20ジョイントのみグラフ化して大幅に短縮する
+python scripts/batch/update_joint_model_data.py --joints legs
+```
+
+### 共通オプション
+
+| オプション | 説明 | 既定 |
+|:--|:--|:--|
+| `--horse-id` | 対象馬ID。`4` でも `ID_4` でも可。環境変数 `PFERD_HORSE_ID` でも指定できる | `ID_4` |
+| `--joints` | グラフ化するジョイントの絞り込み。`all` / `legs` / `4,5,6` | `all` |
+| `--dpi` | 出力PNGの解像度 | `150` |
+
+`--horse-id` は個別のスクリプトでも同じように使えます。
+
+```sh
+python scripts/input_dataset/save_betas_batch.py --horse-id 2
+python scripts/input_joint_model_data/relative_angle/create_xyz_angle_graphs.py --joints legs --dpi 100
+```
+
+`--joints` と `--dpi` はグラフ生成スクリプトにのみ存在します。処理時間の大半は
+グラフ生成が占めるため、脚部だけが必要なら `--joints legs` を指定してください。
 
 ---
 

@@ -16,7 +16,9 @@ import re
 import csv
 import sys
 
-horse_id = 'ID_4'
+from scripts.utils.cli import parse_horse_id
+
+horse_id = parse_horse_id('サマリー画像の一覧HTMLギャラリーを生成する')
 summary_dir = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'summary')
 output_html = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'axis_gallery.html')
 

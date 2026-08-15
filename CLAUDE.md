@@ -49,6 +49,21 @@ conda install -c anaconda scikit-learn=1.0.2
 
 `scripts/batch/update_joint_model_data.py` が上記18本を依存順に一括実行します。
 
+## スクリプト共通のコマンドライン引数
+
+`scripts/utils/cli.py` が共通の引数を提供します。パイプラインの各スクリプトに `'ID_4'` を
+直書きせず、必ずこのヘルパを経由してください。
+
+- `--horse-id` — 対象馬ID（`4` / `ID_4` のどちらでも可。環境変数 `PFERD_HORSE_ID` でも指定可）。既定 `ID_4`
+- `--joints` — グラフ化するジョイントの絞り込み（`all` / `legs` / `4,5,6`）。グラフ生成スクリプトのみ
+- `--dpi` — 出力PNGの解像度。既定 150。グラフ生成スクリプトのみ
+
+バッチランナーは `--horse-id` を全スクリプトへ、`--joints` / `--dpi` を `GRAPH_SCRIPTS`
+に登録されたスクリプトへのみ転送します。グラフ系スクリプトを追加したらこの集合にも追加してください。
+
+グラフ描画は `scripts/utils/plotting.py` の `save_scatter` / `save_smooth` を使います
+（Aggバックエンド固定・Figure使い回し）。`plt.figure()` を直接呼ばないでください。
+
 ## 座標系の注意
 
 - hSMALローカル座標: X=前方, Y=左, Z=上

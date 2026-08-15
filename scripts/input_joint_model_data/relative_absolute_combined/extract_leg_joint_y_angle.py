@@ -11,10 +11,11 @@ python extract_leg_joint_y_angle.py
 import os
 import glob
 import pandas as pd
+from scripts.utils.cli import parse_horse_id
 
 
 def main():
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('脚部角度CSVからY軸成分のみを抽出しCSV保存する')
     input_dir = os.path.join('JOINT_MODEL_DATA', 'Leg_Joint_Angles', horse_id)
     # 他の馬IDを処理したときに出力が混ざらないよう、出力先にもhorse_idを含める
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Leg_Joint_Angles_y_only', horse_id)

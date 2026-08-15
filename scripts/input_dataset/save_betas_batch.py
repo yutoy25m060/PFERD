@@ -14,11 +14,12 @@ import os
 import glob
 import numpy as np
 import pandas as pd
+from scripts.utils.cli import parse_horse_id
 
 
 def main():
     # --- 設定 ---
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('npzから体型パラメータ（betas）を抽出しCSV保存する')
     input_dir = os.path.join('dataset', horse_id, 'MODEL_DATA')
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Beta_shape_Data', horse_id)
 

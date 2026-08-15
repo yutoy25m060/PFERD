@@ -32,6 +32,7 @@ import pandas as pd
 import torch
 
 from utils.smal import SMALLayer, HSMAL
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names
 
 
@@ -50,7 +51,7 @@ def compute_joints_xyz(smal_layer, poses, betas, trans, device):
 
 def main():
     # --- 設定 ---
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('フォワードキネマティクスで各ジョイントの空間座標を計算しCSV保存する')
     input_dir = os.path.join('dataset', horse_id, 'MODEL_DATA')
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Spatial_xyz_Data', horse_id)
     model_path = os.path.join('hSMALdata', 'my_smpl_0000_horse_new_skeleton_horse.pkl')

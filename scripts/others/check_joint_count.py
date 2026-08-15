@@ -10,13 +10,23 @@
 【出力】
 - 標準出力にジョイント数やshapeを表示
 """
+import glob
 import numpy as np
 import torch
 from utils.smal import SMALLayer, HSMAL
 import os
 
+from scripts.utils.cli import parse_horse_id
+
 def main():
-    npz_path = os.path.join('dataset', 'ID_4', 'MODEL_DATA', '20201129_ID_4_0007_hsmal.npz')
+    horse_id = parse_horse_id('npzとhSMALモデルからジョイント数・shapeを確認する')
+    input_dir = os.path.join('dataset', horse_id, 'MODEL_DATA')
+    npz_files = sorted(glob.glob(os.path.join(input_dir, '*_hsmal.npz')))
+    if not npz_files:
+        print(f'No npz files found in {input_dir}')
+        return
+    npz_path = npz_files[0]  # 確認用途なので最初の1本で十分
+    print(f'対象ファイル: {npz_path}')
     model_path = os.path.join('hSMALdata', 'my_smpl_0000_horse_new_skeleton_horse.pkl')
     npz = np.load(npz_path, allow_pickle=True)
     poses = npz['poses']

@@ -1,15 +1,16 @@
 import os
 import glob
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import make_interp_spline
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.cli import build_parser
 from scripts.utils.joint_utils import load_joint_names
+from scripts.utils.plotting import save_scatter, save_smooth
 
 # 設定
-horse_id = 'ID_4'
+args = build_parser('絶対角度と相対角度を同一y軸範囲で並べたグラフを生成する', graph_args=True).parse_args()
+horse_id = args.horse_id
 abs_dir = os.path.join('JOINT_MODEL_DATA', 'Absolute_Angles', horse_id)
 xyz_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Degree_from_poses', horse_id)
 abs_sel_dir = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'Absolute_Angles')
@@ -44,6 +45,8 @@ for idx, key in enumerate(common_keys):
     frames_xyz = xyz_df['frame'].values
     # 各ジョイント・各軸ごとにy軸範囲を決定
     for joint_idx, joint_name in enumerate(joint_names):
+        if args.joints is not None and joint_idx not in args.joints:
+            continue
         print(f'  ジョイント: joint{joint_idx} ({joint_name})')
         for axis in axes:
             col = f'joint{joint_idx}_{joint_name}_{axis} [deg]'
@@ -66,33 +69,16 @@ for idx, key in enumerate(common_keys):
                 ('smooth', xyz_angles, frames_xyz, xyz_outdir, 'Angle_xyz_Degree_from_poses')
             ]:
                 print(f'    軸: {axis} | {label} | {mode} ... 作成中')
-                plt.figure(figsize=(12, 6))
-                if mode == 'scatter':
-                    plt.scatter(frames, data, alpha=0.6, s=1, color='blue', label='Data points')
-                else:
-                    if len(frames) > 10:
-                        step = max(1, len(frames) // 1000)
-                        smooth_frames = frames[::step]
-                        smooth_data = data[::step]
-                        if len(smooth_frames) > 3:
-                            try:
-                                spline = make_interp_spline(smooth_frames, smooth_data, k=3)
-                                smooth_x = np.linspace(frames[0], frames[-1], 1000)
-                                smooth_y = spline(smooth_x)
-                                plt.plot(smooth_x, smooth_y, color='red', linewidth=2, label='Smooth line')
-                            except:
-                                plt.plot(smooth_frames, smooth_data, color='red', linewidth=2, label='Smooth line')
-                plt.xlabel('Frame', fontsize=12)
-                plt.ylabel(f'{axis.upper()} Angle [deg]', fontsize=12)
-                plt.ylim(y_min, y_max)
-                plt.grid(True, alpha=0.3)
-                plt.legend()
                 fname = f'joint{joint_idx}_{joint_name}_{axis}_{mode}.png'
-                plt.tight_layout()
                 save_path = os.path.join(outdir, fname)
-                plt.savefig(save_path, dpi=300, bbox_inches='tight')
-                plt.close()
-                print(f'      → 保存: {save_path}')
+                ylabel = f'{axis.upper()} Angle [deg]'
+                # 絶対角度と相対角度を見比べられるよう、y軸範囲は両者の和集合で揃える
+                ylim = (y_min, y_max)
+                if mode == 'scatter':
+                    save_scatter(frames, data, ylabel, save_path, dpi=args.dpi, ylim=ylim)
+                    print(f'      → 保存: {save_path}')
+                elif save_smooth(frames, data, ylabel, save_path, dpi=args.dpi, ylim=ylim):
+                    print(f'      → 保存: {save_path}')
                 # y軸範囲をテキストで保存（scatterのときのみでOK）
                 if mode == 'scatter':
                     yaxis_txt = os.path.join(outdir, f'joint{joint_idx}_{joint_name}_{axis}_yaxis.txt')

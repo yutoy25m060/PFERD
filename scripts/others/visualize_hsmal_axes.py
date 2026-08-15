@@ -16,10 +16,12 @@ import csv
 import os
 from utils.smal import SMALLayer, HSMAL
 from scipy.spatial.transform import Rotation as R
+from scripts.utils.cli import parse_horse_id
 
 # --- 設定 ---
 model_path = os.path.join('hSMALdata', 'my_smpl_0000_horse_new_skeleton_horse.pkl')
-parents_csv = os.path.join('JOINT_MODEL_DATA', 'Parents_Info', 'ID_4', 'parents_hsmal36.csv')
+horse_id = parse_horse_id('hSMALのTポーズ3Dスケルトンと各ジョイントの軸を可視化する')
+parents_csv = os.path.join('JOINT_MODEL_DATA', 'Parents_Info', horse_id, 'parents_hsmal36.csv')
 names_csv = parents_csv  # 統合ファイルを参照
 device = 'cpu'
 

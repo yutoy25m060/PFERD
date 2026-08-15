@@ -2,8 +2,10 @@ import os
 import re
 import sys
 
+from scripts.utils.cli import parse_horse_id
+
 # 設定
-horse_id = 'ID_4'
+horse_id = parse_horse_id('絶対角度と相対角度のグラフでy軸範囲が一致しているか検証する')
 abs_sel_dir = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'Absolute_Angles')
 xyz_sel_dir = os.path.join('JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id, 'Angle_xyz_Degree_from_poses')
 

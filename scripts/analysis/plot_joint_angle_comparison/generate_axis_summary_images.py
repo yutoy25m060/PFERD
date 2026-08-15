@@ -21,8 +21,10 @@ import glob
 import re
 from PIL import Image
 
+from scripts.utils.cli import parse_horse_id
+
 # 設定
-horse_id = 'ID_4'
+horse_id = parse_horse_id('絶対角度と相対角度のグラフを左右に連結したサマリー画像を生成する')
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..', 'JOINT_MODEL_DATA', 'Selected_Joint_Graphs', horse_id))
 abs_dir = os.path.join(base_dir, 'Absolute_Angles')
 xyz_dir = os.path.join(base_dir, 'Angle_xyz_Degree_from_poses')

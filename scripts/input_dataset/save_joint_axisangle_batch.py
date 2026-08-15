@@ -17,11 +17,12 @@ import pandas as pd
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names
 
 def main():
     # --- 設定 ---
-    horse_id = 'ID_4'
+    horse_id = parse_horse_id('npzから各ジョイントの軸角（axis-angle）を抽出しCSV保存する')
     input_dir = os.path.join('dataset', horse_id, 'MODEL_DATA')
     output_dir = os.path.join('JOINT_MODEL_DATA', 'Angle_xyz_Data_from_poses', horse_id)
 

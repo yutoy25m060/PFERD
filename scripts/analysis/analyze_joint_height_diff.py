@@ -18,14 +18,20 @@
 - 統計情報（標準出力）
 - 可視化グラフ（joint_height_difference_analysis.png）
 """
+import glob
+import os
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def analyze_joint_height_difference():
+from scripts.utils.cli import parse_horse_id
+
+def analyze_joint_height_difference(csv_path):
     # データ読み込み
-    df = pd.read_csv('JOINT_MODEL_DATA/Spatial_xyz_Data/ID_4/20201129_ID_4_0002_hsmal_joints_xyz.csv')
-    
+    print(f'対象ファイル: {csv_path}')
+    df = pd.read_csv(csv_path)
+
     # ジョイント18番（l_hip）と22番（lh_hoof）のZ座標を取得
     joint18_z = df['18_l_hip_z [mm]']
     joint22_z = df['22_lh_hoof_z [mm]']
@@ -106,4 +112,12 @@ def analyze_joint_height_difference():
     return height_diff
 
 if __name__ == "__main__":
-    height_diff = analyze_joint_height_difference() 
+    horse_id = parse_horse_id('指定ジョイントの高さ差を分析・可視化する')
+    input_dir = os.path.join('JOINT_MODEL_DATA', 'Spatial_xyz_Data', horse_id)
+    csv_files = sorted(glob.glob(os.path.join(input_dir, '*_joints_xyz.csv')))
+    if not csv_files:
+        print(f'空間座標CSVが見つかりません: {input_dir}')
+        print('先に scripts/input_dataset/forward_kinematics_example.py を実行してください。')
+        raise SystemExit(0)
+    # 複数ある場合は最初の1本を対象にする
+    height_diff = analyze_joint_height_difference(csv_files[0]) 
