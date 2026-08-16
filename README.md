@@ -13,6 +13,13 @@ In Scientific Data 2024
 
 PFERD, a dense motion capture dataset of horses of diverse conformation and poses with rich 3D horse articulated motion data. This repository provides codes to visualize the data and evaluate the data.
 
+## Repository Guide
+
+This is the original upstream PFERD codebase (visualization/evaluation demos below). This fork
+additionally includes a custom data-processing pipeline under `scripts/` — see
+[README_my_pipeline.md](README_my_pipeline.md) for its documentation (Japanese). AI coding
+assistants working in this repo should also read [CLAUDE.md](CLAUDE.md).
+
 ## Installation
 
 The codes are tested in Python3.7, Pytorch 1.8.2, Aitviewer v1.9.0 for Ubuntu 18.0. Below we prepare the python environment using Anaconda.
@@ -43,6 +50,9 @@ pip install git+https://github.com/nghorbani/body_visualizer.git
 ```
 
 Installation of `psbody.smpl` and `psbody.mesh`, please check [SOMA](https://github.com/nghorbani/soma).
+
+After installing, run `python scripts/check_setup.py` to verify required packages, model/dataset
+paths, and device configuration before running any demo or pipeline script.
 
 
 ## Access to the hSMAL Model

@@ -27,6 +27,7 @@ from aitviewer.viewer import Viewer
 from aitviewer.renderables.spheres import Spheres
 from utils.smal import SMALLayer, HSMAL
 from utils.readfile import read_mocap,read_results
+from utils.model_files import require_files
 
 def find_id(missing, data_length, start, end, downSample):
     enabled_frames = np.ones(data_length, dtype=np.bool8)
@@ -58,6 +59,7 @@ def Load_Visualization(ID=1, mocapname='20201128_ID_1_0008', start=None, end = N
     missing_frame = data['missing_frame']
     enabled_frames, id_ = find_id(missing_frame, data_length, start, end, downSample = downSample)
 
+    require_files(CONFIG.ModelPATH)
     smal_layer = SMALLayer(
         model_path=CONFIG.ModelPATH,
         model_cls=HSMAL,
@@ -105,11 +107,14 @@ def Load_Visualization(ID=1, mocapname='20201128_ID_1_0008', start=None, end = N
 
 def parse_augment():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ID", type=int, default=1)
-    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007')
-    parser.add_argument("--start", type=int, default=None)
-    parser.add_argument("--end", type=int, default=None)
+    parser = argparse.ArgumentParser(
+        description='hSMALモデルの推定結果を3Dビューワー（aitviewer）で可視化する。'
+                     '--VISUAL_MOCAP を付けるとC3Dモーションキャプチャデータも重ねて表示する。')
+    parser.add_argument("--ID", type=int, default=1, help='対象馬ID（dataset/ID_<ID>/ を参照）')
+    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007',
+                         help='推定結果ファイル名（拡張子・パス不要。dataset/ID_<ID>/MODEL_DATA/<mocapname>_hsmal.npz を読む）')
+    parser.add_argument("--start", type=int, default=None, help='可視化を開始するフレーム番号（既定: 先頭から）')
+    parser.add_argument("--end", type=int, default=None, help='可視化を終了するフレーム番号（既定: 末尾まで）')
     parser.add_argument("--downSample", type=int, default=8, help='mocap framerate 240hz, downsample the mocap data')
     parser.add_argument('--VISUAL_MOCAP', action='store_true', help='Whether visualizing')
     args = parser.parse_args()

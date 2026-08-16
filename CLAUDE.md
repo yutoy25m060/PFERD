@@ -25,6 +25,9 @@ conda install -c anaconda scikit-learn=1.0.2
 ```
 
 設定は `CONFIG.py` に集約されており、モデルパス・データセットパス・デバイス指定（`DEVICE`）はここを参照します。
+`DEVICE` はCUDAが使えない環境では自動的にCPUへフォールバックします（警告表示あり）。
+
+セットアップ後は `python scripts/check_setup.py` で依存パッケージ・モデル/データセットの配置・デバイス設定を確認できます。
 
 ## ディレクトリ構成
 
@@ -46,6 +49,7 @@ conda install -c anaconda scikit-learn=1.0.2
 4. `extract_joint_*` 系スクリプト — 相対・絶対角度からY軸／XYZ角度成分を抽出
 5. `create_*_graphs.py` — 角度データのグラフ化
 6. `plot_joint_angle_comparison.py` → `generate_axis_summary_images.py` → `generate_axis_gallery_html.py` — 絶対角度と相対角度の比較グラフ、サマリー画像、一覧HTMLの生成（この順序に依存）
+7. `check_yaxis_range.py` — 絶対角度・相対角度グラフのy軸範囲の整合性を検証（出力ファイルなし、標準出力のみ）
 
 `scripts/batch/update_joint_model_data.py` が上記18本を依存順に一括実行します。
 

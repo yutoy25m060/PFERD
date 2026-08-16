@@ -16,6 +16,7 @@ from utils.project import get_cams_renderers, reproject_masks, reproject_keypoin
 
 from human_body_prior.body_model.body_model import BodyModel
 from human_body_prior.tools.omni_tools import copy2cpu as c2c
+from utils.model_files import require_files
 
 def projection(ID=1, mocapname = '20201128_ID_1_0008', cameraID = None, start=None, end = None, VISUAL = True, VISUAL_MOCAP = True):
     # load hSMAL results
@@ -44,6 +45,7 @@ def projection(ID=1, mocapname = '20201128_ID_1_0008', cameraID = None, start=No
     fps = [int(v.get(cv2.CAP_PROP_FPS)) for v in vlist]
     assert len(set(fps)) == 1
     # load model
+    require_files(CONFIG.ModelNPZPATH)
     bm = BodyModel(bm_fname=CONFIG.ModelNPZPATH, num_betas=10).to(CONFIG.DEVICE)
     faces = c2c(bm.f)
 
@@ -99,12 +101,15 @@ def projection(ID=1, mocapname = '20201128_ID_1_0008', cameraID = None, start=No
 
 def parse_augment():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ID", type=int, default=1)
-    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007')
+    parser = argparse.ArgumentParser(
+        description='hSMAL推定結果をカメラ較正情報を用いて画像平面に投影し、可視化する。'
+                     'モーションキャプチャのマーカー再投影も重ねられる。')
+    parser.add_argument("--ID", type=int, default=1, help='対象馬ID（dataset/ID_<ID>/ を参照）')
+    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007',
+                         help='推定結果ファイル名（拡張子・パス不要。dataset/ID_<ID>/MODEL_DATA/<mocapname>_hsmal.npz を読む）')
     parser.add_argument("--cameraID", type=str, default=None, help='None, 20715, 21386, 23348, 23350, 23414, 23415, 23416, 23417, 23603, 23604')
-    parser.add_argument("--start", type=int, default=None)
-    parser.add_argument("--end", type=int, default=None)
+    parser.add_argument("--start", type=int, default=None, help='投影を開始するフレーム番号（既定: 先頭から）')
+    parser.add_argument("--end", type=int, default=None, help='投影を終了するフレーム番号（既定: 末尾まで）')
     parser.add_argument('--VISUAL', action='store_true', help='Visualize model')
     parser.add_argument('--VISUAL_MOCAP', action='store_true', help='Visualize mocap')
     args = parser.parse_args()

@@ -7,6 +7,13 @@
 
 ---
 
+## セットアップ確認
+
+依存パッケージ・モデル/データセットの配置・デバイス設定が揃っているかは
+`python scripts/check_setup.py` で事前に確認できます（`--horse-id` で対象馬IDを指定可能）。
+
+---
+
 ## ディレクトリ構成
 
 ```
@@ -21,9 +28,14 @@ JOINT_MODEL_DATA/
   ├── Absolute_Angles/            # 各ジョイントのxyz絶対角度（degree, ワールド座標系）
   ├── Absolute_Y_Degree/          # 各ジョイントのy軸絶対角度のみ（degree, ワールド座標系）
   ├── Spatial_xyz_Data_from_trans/# モデル全体の並進データ（trans）
-  ├── Whole_Model_xyz_Data_from_trans/ # モデル全体の並進データ（別用途/形式）
-  └── Motion_Movie_from_Load_Visualization/ # 可視化動画や説明ファイル
+  ├── Leg_Joint_Angles/           # 脚部基準ジョイントの絶対角度＋子孫の相対角度、脚用グラフ
+  ├── Leg_Joint_Angles_y_only/    # 脚部角度のY軸成分のみ抽出
+  └── Selected_Joint_Graphs/      # 絶対角度と相対角度の比較グラフ・サマリー画像・一覧HTML
 ```
+
+`Motion_Movie_from_Load_Visualization/` はパイプラインの自動出力ではなく、
+`Load_Visualization.py`（ファイル出力なし・ビューワー表示のみ）のセッションを
+手動で録画・保存したい場合の慣習的な保存先です。
 
 ---
 
@@ -35,7 +47,6 @@ JOINT_MODEL_DATA/
 | save_joint_axisangle_batch.py | npzファイルから各ジョイントの軸角（axis-angle）を抽出し、CSV保存（新ジョイント名対応） |
 | save_translation_batch.py | npzファイルからモデル全体の並進（trans）を抽出し、CSV保存 |
 | forward_kinematics_example.py | npzファイルから各ジョイントの空間座標を計算し、CSV保存（hSMALモデル・パラメータを用いたフォワードキネマティクス。出力は36ジョイント分のxyz座標。座標系や出力例は下記参照） |
-| check_joint_count.py | npzファイルからジョイント数を確認し、標準出力に表示 |
 | calc_parent_child_distances_batch.py | 空間座標CSVと親子リストCSVから親子間距離・統計量を計算し、CSV保存 |
 | extract_joint_y_angle_from_axisangle.py | 各CSVから各関節のy軸角度（degree, 相対角度）のみを抽出し、CSV保存（新ジョイント名対応） |
 | extract_joint_xyz_angle_from_axisangle.py | 各CSVから各関節のxyz角度（degree, 相対角度）を抽出し、CSV保存（新ジョイント名対応） |
@@ -49,6 +60,10 @@ JOINT_MODEL_DATA/
 | plot_joint_angle_comparison.py | 絶対角度と相対角度を同一のy軸範囲で並べたグラフを出力 |
 | generate_axis_summary_images.py | 絶対角度・相対角度のグラフを左右に連結したサマリー画像を生成 |
 | generate_axis_gallery_html.py | サマリー画像の一覧HTMLギャラリーを生成 |
+| check_yaxis_range.py | 絶対角度・相対角度グラフのy軸範囲が一致しているか検証（パイプライン最終ステップ） |
+
+`check_joint_count.py` 等 `scripts/others/` 配下のスクリプトは個別実行の診断・可視化ツールで、
+`scripts/batch/update_joint_model_data.py` のバッチパイプラインには含まれていません。
 
 ---
 
@@ -156,9 +171,15 @@ python scripts/input_joint_model_data/relative_angle/create_xyz_angle_graphs.py 
 
 ---
 
-## Load_Visualization.py の使い方
+## トップレベルスクリプト（可視化・評価）
 
-`Load_Visualization.py` は、hSMALモデル推定結果（ポーズ・ベータ・トランスレーション）を3Dビューワー（aitviewer）で可視化するためのスクリプトです。  
+基本的なコマンド例は README.md の Run demo code にもあります。ここでは主に
+Load_Visualization.py のオプションを補足し、他の3スクリプトは概要のみ記載します
+（詳細は各スクリプトの `--help`、または README.md 参照）。
+
+### Load_Visualization.py
+
+hSMALモデル推定結果（ポーズ・ベータ・トランスレーション）を3Dビューワー（aitviewer）で可視化するためのスクリプトです。  
 オプションでモーションキャプチャデータ（C3D）も重ねて表示できます。
 
 ### コマンド例
@@ -179,6 +200,30 @@ python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --e
 
 - 入力: `CONFIG.py` で指定されたパスのhSMAL推定結果（例: dataset/ID_x/MODEL_DATA/xxxx_hsmal.npz）、hSMALモデル（.pkl）、（オプション）C3Dファイル
 - 出力: 3Dビューワーによる可視化（ファイル出力はなし）
+
+### Projection.py
+
+hSMAL推定結果とカメラ情報を用いて画像平面へ投影・可視化するスクリプトです。モーションキャプチャのマーカー再投影も重ねられます。
+
+```sh
+python Projection.py --ID 1 --mocapname '20201128_ID_1_0007' --cameraID '20715' --VISUAL --VISUAL_MOCAP
+```
+
+### Eval_iou.py
+
+hSMAL推定結果とセグメンテーションマスクのIoU（Intersection over Union）を評価するスクリプトです。
+
+```sh
+python Eval_iou.py --ID 1 --mocapname '20201128_ID_1_0007' --VISUAL
+```
+
+### Eval_3Ddistance.py
+
+hSMAL推定結果とモーションキャプチャの3Dマーカー距離を評価するスクリプトです。
+
+```sh
+python Eval_3Ddistance.py --ID 1 --mocapname '20201128_ID_1_0007' --VISUAL
+```
 
 ---
 

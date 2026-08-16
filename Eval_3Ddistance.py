@@ -15,6 +15,7 @@ from body_visualizer.mesh.psbody_mesh_sphere import points_to_spheres
 from moshpp.models.bodymodel_loader import load_moshpp_models
 from moshpp.transformed_lm import TransformedCoeffs,TransformedLms
 from utils.readfile import read_results, read_mocap
+from utils.model_files import require_files
 
 def eval_3ddistance(ID=1, mocapname = '20201128_ID_1_0008', VISUAL = True):
     # load hSMAL results
@@ -30,6 +31,7 @@ def eval_3ddistance(ID=1, mocapname = '20201128_ID_1_0008', VISUAL = True):
     assert mocaplength == resultsdata['poses'].shape[0]
 
     # load model
+    require_files(CONFIG.ModelPATH, CONFIG.ModelPriorPATH)
     can_model, opt_models = load_moshpp_models(
         surface_model_fname=CONFIG.ModelPATH,
         surface_model_type='animal_horse',
@@ -88,9 +90,11 @@ def eval_3ddistance(ID=1, mocapname = '20201128_ID_1_0008', VISUAL = True):
 
 def parse_augment():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ID", type=int, default=1)
-    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007')
+    parser = argparse.ArgumentParser(
+        description='hSMAL推定結果とモーションキャプチャの3Dマーカー距離を評価する。')
+    parser.add_argument("--ID", type=int, default=1, help='対象馬ID（dataset/ID_<ID>/ を参照）')
+    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007',
+                         help='推定結果ファイル名（拡張子・パス不要。dataset/ID_<ID>/MODEL_DATA/<mocapname>_hsmal.npz を読む）')
     parser.add_argument('--VISUAL', action='store_true', help='Whether visualizing')
     args = parser.parse_args()
     return args

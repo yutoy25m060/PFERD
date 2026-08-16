@@ -32,6 +32,7 @@ import pandas as pd
 import torch
 
 from utils.smal import SMALLayer, HSMAL
+from utils.model_files import require_files
 from scripts.utils.cli import parse_horse_id
 from scripts.utils.joint_utils import load_joint_names
 
@@ -64,6 +65,7 @@ def main():
         print(f"No npz files found in {input_dir}")
         return
 
+    require_files(model_path)
     segment_names = load_joint_names(horse_id)
 
     # モデルのロードは重い（.pklが約58MB）ので、num_betasが同じ間は使い回す

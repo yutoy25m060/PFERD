@@ -17,6 +17,7 @@ from utils.project import get_cams_renderers, reproject_masks
 
 from human_body_prior.body_model.body_model import BodyModel
 from human_body_prior.tools.omni_tools import copy2cpu as c2c
+from utils.model_files import require_files
 
 
 def cal_iou( mask_pred, M_gt):
@@ -51,6 +52,7 @@ def eval_iou(ID=1, mocapname = '20201128_ID_1_0008', VISUAL = True):
         sys.exit(0)
 
     # load model
+    require_files(CONFIG.ModelNPZPATH)
     bm = BodyModel(bm_fname=CONFIG.ModelNPZPATH, num_betas=10).to(CONFIG.DEVICE)
     faces = c2c(bm.f)
 
@@ -106,9 +108,11 @@ def eval_iou(ID=1, mocapname = '20201128_ID_1_0008', VISUAL = True):
 
 def parse_augment():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--ID", type=int, default=1)
-    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007')
+    parser = argparse.ArgumentParser(
+        description='hSMAL推定結果とセグメンテーションマスクのIoU（Intersection over Union）を評価する。')
+    parser.add_argument("--ID", type=int, default=1, help='対象馬ID（dataset/ID_<ID>/ を参照）')
+    parser.add_argument("--mocapname", type=str, default='20201128_ID_1_0007',
+                         help='推定結果ファイル名（拡張子・パス不要。dataset/ID_<ID>/MODEL_DATA/<mocapname>_hsmal.npz を読む）')
     parser.add_argument('--VISUAL', action='store_true', help='Whether visualizing')
     args = parser.parse_args()
     return args
