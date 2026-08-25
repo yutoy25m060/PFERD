@@ -9,6 +9,9 @@
 
 ## セットアップ確認
 
+環境構築は uv（`uv sync`）で行います。詳細は [CLAUDE.md](CLAUDE.md) の「セットアップ」を参照してください。
+以降の `python xxx.py` は `.venv` を有効化済みの前提です（未有効化なら `uv run python xxx.py` に読み替えてください）。
+
 依存パッケージ・モデル/データセットの配置・デバイス設定が揃っているかは
 `python scripts/check_setup.py` で事前に確認できます（`--horse-id` で対象馬IDを指定可能）。
 

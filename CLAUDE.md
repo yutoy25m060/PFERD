@@ -10,24 +10,36 @@ PFERD (Poses for Equine Research Dataset) は、馬の3Dポーズ・体型を扱
 
 ## セットアップ
 
-Python 3.7 + PyTorch 1.8.2 を前提とした環境です。
+Python 3.8 + PyTorch 1.8.2 を前提とした環境です（[uv](https://docs.astral.sh/uv/) で管理）。
+依存関係は `pyproject.toml` / `uv.lock` に固定されています。
 
 ```bash
 git clone --recurse-submodules https://github.com/Celiali/PFERD.git
-conda create -n PFERD python=3.7
-conda activate PFERD
-pip install torch==1.8.2 torchvision==0.9.2 torchaudio==0.8.2 --extra-index-url https://download.pytorch.org/whl/lts/1.8/cu111
-pip install opencv-python==4.7.0.72 chumpy
-pip install smplx[all] aitviewer==1.9.0
-conda install -c conda-forge ezc3d=1.4.9
-conda install -c conda-forge loguru
-conda install -c anaconda scikit-learn=1.0.2
+cd PFERD
+uv sync
 ```
+
+`uv sync` は `.python-version`（3.8）に従って自動的にPythonをダウンロードし、`.venv` に依存パッケージ一式（torch/torchvision/torchaudio はPyTorch LTS 1.8 の cu111 インデックスから）をインストールします。
+スクリプトは `uv run python <script>` で実行するか、`.venv` をアクティベートしてから実行してください。
+
+**ezc3d は含まれていません。** PyPI版は Python>=3.10 専用で、torch==1.8.2 が要求する Python 3.8 と共存できないため。
+`--VISUAL_MOCAP`（C3Dモーションキャプチャ重畳表示、[Load_Visualization.py](Load_Visualization.py)のオプション機能）を使う場合のみ必要で、npzベースの本パイプライン（`scripts/` 配下）では未使用です。必要な場合は別途 conda 環境で `conda install -c conda-forge ezc3d=1.4.9` するか、CMake+MSVCでソースビルドしてください。
 
 設定は `CONFIG.py` に集約されており、モデルパス・データセットパス・デバイス指定（`DEVICE`）はここを参照します。
 `DEVICE` はCUDAが使えない環境では自動的にCPUへフォールバックします（警告表示あり）。
 
-セットアップ後は `python scripts/check_setup.py` で依存パッケージ・モデル/データセットの配置・デバイス設定を確認できます。
+セットアップ後は `uv run python scripts/check_setup.py` で依存パッケージ・モデル/データセットの配置・デバイス設定を確認できます。
+
+**hSMALモデル・PFERDデータセットの入手方法**は README.md の「Access to the hSMAL Model」「Access to
+the PFERD Dataset」節を参照してください（hSMALモデルは `hSMALdata/` に、PFERDデータセットは
+`dataset/` に、それぞれ配置します）。
+
+**`moshpp` サブモジュールについて（既知の問題・保留中）**: `.gitmodules` が固定しているコミット
+（`922ebf9c...`）が upstream の `nghorbani/moshpp` リポジトリから消失しており、
+`git clone --recurse-submodules` / `git submodule update --init --recursive` は失敗します
+（`fatal: remote error: upload-pack: not our ref ...`）。npzベースの本パイプライン（`scripts/`
+配下）は moshpp に依存しないため影響はありませんが、`--VISUAL_MOCAP` や `Eval_3Ddistance.py` 等
+upstream の一部機能は現状 moshpp なしでは動作しません。
 
 ## ディレクトリ構成
 

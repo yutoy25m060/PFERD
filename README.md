@@ -22,37 +22,33 @@ assistants working in this repo should also read [CLAUDE.md](CLAUDE.md).
 
 ## Installation
 
-The codes are tested in Python3.7, Pytorch 1.8.2, Aitviewer v1.9.0 for Ubuntu 18.0. Below we prepare the python environment using Anaconda.
+The codes are tested with Python 3.8, PyTorch 1.8.2, Aitviewer v1.9.0. The environment is managed
+with [uv](https://docs.astral.sh/uv/); dependencies are pinned in `pyproject.toml` / `uv.lock`.
 
 ``` bash
 git clone --recurse-submodules https://github.com/Celiali/PFERD.git
-
-# 1. Create a conda virtual environment.
-conda create -n PFERD python=3.7
-conda activate PFERD
-
-pip install torch==1.8.2 torchvision==0.9.2 torchaudio==0.8.2 --extra-index-url https://download.pytorch.org/whl/lts/1.8/cu111
-pip install opencv-python==4.7.0.72
-pip install chumpy
-
-# 2. For visualization 
-pip install smplx[all]
-pip install aitviewer==1.9.0
-
-# 3. For loading c3d file
-conda install -c conda-forge ezc3d=1.4.9
-
-# 4. For evaluation
-conda install -c conda-forge loguru
-conda install -c anaconda scikit-learn=1.0.2
-pip install git+https://github.com/nghorbani/human_body_prior.git@SOMA
-pip install git+https://github.com/nghorbani/body_visualizer.git
+cd PFERD
+uv sync
 ```
 
-Installation of `psbody.smpl` and `psbody.mesh`, please check [SOMA](https://github.com/nghorbani/soma).
+`uv sync` downloads Python 3.8 (per `.python-version`) if needed and installs everything into
+`.venv`, including torch/torchvision/torchaudio from the PyTorch LTS 1.8 (cu111) index. Run
+scripts with `uv run python <script>`, or activate `.venv` directly.
 
-After installing, run `python scripts/check_setup.py` to verify required packages, model/dataset
-paths, and device configuration before running any demo or pipeline script.
+**Not included:** `ezc3d` (for loading `.c3d` mocap files) — the PyPI package requires Python
+>= 3.10, which conflicts with the Python 3.8 pin required by `torch==1.8.2`. It's only needed for
+the optional `--VISUAL_MOCAP` overlay in [Load_Visualization.py](Load_Visualization.py), not for
+the core `scripts/` pipeline. If you need it, install it in a separate conda environment
+(`conda install -c conda-forge ezc3d=1.4.9`) or build it from source with CMake + a C++ compiler.
+
+For the original upstream evaluation scripts ([Eval_iou.py](Eval_iou.py),
+[Eval_3Ddistance.py](Eval_3Ddistance.py), [Projection.py](Projection.py)), you'll additionally need
+`human_body_prior`, `body_visualizer`, and `psbody.mesh`/`psbody.smpl` — see
+[SOMA](https://github.com/nghorbani/soma) for `psbody` installation, which typically requires a
+Linux build environment and is not covered by the uv setup above.
+
+After installing, run `uv run python scripts/check_setup.py` to verify required packages,
+model/dataset paths, and device configuration before running any demo or pipeline script.
 
 
 ## Access to the hSMAL Model

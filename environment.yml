@@ -1,4 +1,8 @@
-# PFERD 環境セットアップ手順
+# 【非推奨】通常は `uv sync`（pyproject.toml / uv.lock）を使ってください。
+# このファイルは、ezc3d や psbody.mesh など uv では入れられない依存関係を
+# 別途condaで用意したい場合の参考として残しています。
+#
+# PFERD 環境セットアップ手順（conda版）
 # 1. Anaconda または Miniconda をインストールしてください。
 # 2. この environment.yml があるディレクトリで、以下のコマンドを実行してください：
 #    conda env create -f environment.yml
