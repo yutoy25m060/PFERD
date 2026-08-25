@@ -20,6 +20,11 @@ import importlib
 import os
 import sys
 
+# Windows既定コンソール(cp932)では✓/✗が出力できずUnicodeEncodeErrorで落ちるため、
+# 標準出力をUTF-8に固定する。
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from scripts.utils.cli import build_parser
