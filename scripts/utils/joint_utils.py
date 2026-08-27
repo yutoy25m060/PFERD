@@ -4,6 +4,22 @@
 import pandas as pd
 import os
 
+# 脚部の運動連鎖（parents_hsmal36.csv の親子構造に準拠）
+# 各リストは根元→末端の順に並んでおり、隣接ペアが1本の骨セグメントに対応する。
+LEG_CHAINS = {
+    'left_front':  [4, 5, 6, 7, 8],       # l_shoulder → l_elbow → l_carpal → lf_fetlock → lf_hoof
+    'right_front': [9, 10, 11, 12, 13],   # r_shoulder → r_elbow → r_carpal → rf_fetlock → rf_hoof
+    'left_hind':   [18, 19, 20, 21, 22],  # l_hip → l_knee → l_hock → lh_fetlock → lh_hoof
+    'right_hind':  [23, 24, 25, 26, 27],  # r_hip → r_knee → r_hock → rh_fetlock → rh_hoof
+}
+
+# 体幹（骨盤→肩甲骨）。馬ごとの体格差を除いて比較するための基準長に使う。
+TORSO_CHAIN = [0, 1, 2, 3]  # pelvis → spine1 → spine2 → shoulderBlade
+
+# 左右の対応（対称性チェック用）
+LEG_SYMMETRY_PAIRS = [('left_front', 'right_front'), ('left_hind', 'right_hind')]
+
+
 def load_joint_hierarchy(horse_id='ID_4', hierarchy_file='parents_hsmal36.csv'):
     """
     指定された親子構造CSVファイルを読み込み、辞書形式で返す

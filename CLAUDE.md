@@ -84,6 +84,15 @@ python Load_Visualization.py --ID 4 --mocapname 20201129_ID_4_0007 --start 0 --e
 
 `--ID` は対象馬ID、`--mocapname` はモデル推定結果ファイル名（拡張子・パス不要）、`--VISUAL_MOCAP` を付けるとC3Dモーションキャプチャデータも重ねて表示します。
 
+## 脚部骨格比の導出
+
+`scripts/analysis/calc_leg_skeletal_ratios.py` が各馬のbetasから脚部の骨格比を導出します
+（パイプラインとは独立した単体実行スクリプト）。hSMALはリグ型モデルなので骨長はbetasのみで決まり、
+実betasを与えたTポーズ1フレームで骨格が定まります。出力は `JOINT_MODEL_DATA/Leg_Skeletal_Ratios/`。
+
+脚部チェーン（`LEG_CHAINS`）・体幹チェーン（`TORSO_CHAIN`）・左右対応（`LEG_SYMMETRY_PAIRS`）は
+`scripts/utils/joint_utils.py` を唯一の情報源とします。脚のジョイント番号を直書きしないでください。
+
 ## ジョイント構造
 
 36ジョイントの親子構造は `JOINT_MODEL_DATA/Parents_Info/ID_4/parents_hsmal36.csv` に定義されています。ジョイント名や親子関係を変更する場合はこのCSVと整合性を取ってください（`README_my_pipeline.md` に全ジョイント名の一覧あり）。

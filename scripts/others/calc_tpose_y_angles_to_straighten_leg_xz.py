@@ -59,6 +59,7 @@ import os
 import csv
 import torch
 from utils.smal import SMALLayer, HSMAL
+from scripts.utils.joint_utils import LEG_CHAINS
 
 def load_parents_and_names(parents_csv):
     """親子関係とジョイント名を読み込み"""
@@ -136,23 +137,11 @@ def signed_angle_xz(v1, v2):
 def calculate_leg_straightening_angles(joints, parents, joint_names):
     """脚を直線状にするためのy軸回転角度を計算"""
     
-    # 脚の基準ジョイントとチェーン定義
-    leg_chains = {
-        # 左前脚: 4(l_shoulder) → 5 → 6 → 7 → 8
-        'left_front': {'root': 4, 'chain': [4, 5, 6, 7, 8]},
-        # 右前脚: 9(r_shoulder) → 10 → 11 → 12 → 13
-        'right_front': {'root': 9, 'chain': [9, 10, 11, 12, 13]},
-        # 左後脚: 18(l_hip) → 19 → 20 → 21 → 22
-        'left_hind': {'root': 18, 'chain': [18, 19, 20, 21, 22]},
-        # 右後脚: 23(r_hip) → 24 → 25 → 26 → 27
-        'right_hind': {'root': 23, 'chain': [23, 24, 25, 26, 27]}
-    }
-    
+    # 脚のチェーン定義は scripts/utils/joint_utils.py の LEG_CHAINS を唯一の情報源とする
     results = []
-    
-    for leg_name, leg_info in leg_chains.items():
+
+    for leg_name, chain in LEG_CHAINS.items():
         print(f"  {leg_name}脚の計算中...")
-        chain = leg_info['chain']
         
         # 各中間関節について角度を計算
         for i in range(1, len(chain) - 1):  # 最初と最後以外（中間関節）

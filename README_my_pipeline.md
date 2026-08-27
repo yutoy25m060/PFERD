@@ -30,6 +30,7 @@ JOINT_MODEL_DATA/
   ├── Spatial_xyz_Data_from_trans/# モデル全体の並進データ（trans）
   ├── Leg_Joint_Angles/           # 脚部基準ジョイントの絶対角度＋子孫の相対角度、脚用グラフ
   ├── Leg_Joint_Angles_y_only/    # 脚部角度のY軸成分のみ抽出
+  ├── Leg_Skeletal_Ratios/        # 各馬の脚部骨格比（セグメント長mm・脚内比率・左右対称性）
   └── Selected_Joint_Graphs/      # 絶対角度と相対角度の比較グラフ・サマリー画像・一覧HTML
 ```
 
@@ -64,6 +65,37 @@ JOINT_MODEL_DATA/
 
 `check_joint_count.py` 等 `scripts/others/` 配下のスクリプトは個別実行の診断・可視化ツールで、
 `scripts/batch/update_joint_model_data.py` のバッチパイプラインには含まれていません。
+
+---
+
+## 脚部骨格比の導出
+
+`scripts/analysis/calc_leg_skeletal_ratios.py` は、各馬の体型パラメータ（betas）から
+脚部の骨格比（セグメント長・脚内比率・左右対称性）を導出します。
+
+```sh
+set PYTHONPATH=.
+python scripts/analysis/calc_leg_skeletal_ratios.py               # dataset/ 配下の全馬
+python scripts/analysis/calc_leg_skeletal_ratios.py --horse-id 4  # ID_4 のみ
+python scripts/analysis/calc_leg_skeletal_ratios.py --verify      # 実モーションでの骨長安定性も検証
+```
+
+hSMAL/SMALはリグ型モデルのため、**親子ジョイント間の距離（骨長）はポーズを変えても
+変化せず、betasだけで決まります**。そのため実betasを与えたTポーズを1フレーム計算すれば
+その馬の骨格が定まります（`--verify` を付けると `ParentChild_Distances` の統計と
+突き合わせ、実モーション中も骨長が一定であることを確認できます）。
+
+出力は `JOINT_MODEL_DATA/Leg_Skeletal_Ratios/` 配下:
+
+| ファイル | 内容 |
+|:---|:---|
+| `<horse_id>_leg_segment_lengths_mm.csv` | 馬ごとの明細（セグメント長mm・脚内比率・体幹基準比率） |
+| `all_horses_leg_segment_lengths_mm.csv` | 全馬比較（行=馬、列=セグメント、値=長さmm） |
+| `all_horses_leg_segment_ratios.csv` | 全馬比較（値=脚内比率。体格差を除いた形状比較用） |
+| `all_horses_leg_symmetry.csv` | 左右対称性のチェック結果 |
+
+`ratio_within_leg`（脚内比率）はロボットのリンク長比にそのまま転用でき、
+`ratio_to_torso`（体幹基準比率）は馬ごとの体格差を除いた比較に使えます。
 
 ---
 
